@@ -2,15 +2,15 @@
 
 This bundle is a source release, not a newly reproduced experiment. Publishing it does not run full training or verify the paper's numerical results.
 
-The manuscript currently prints the same CuPGeo macro values in the main comparison and the matched ablation table, while its protocol distinguishes a 120-epoch single-stage main run from a 120+120-epoch ablation run. This release keeps those workflows separate. The numerical rows should be tied to their original checkpoint hashes before claiming that each table has been independently reproduced.
+The current manuscript states that Tables 1 and 2 use 240-epoch runs. This release maps their identical CuPGeo Full values to the same matched CP 120 + Full 120 checkpoint. MixStyle and DSU use separate 240-epoch runs; a single-stage 120-epoch CuPGeo run is not presented as Table 1 evidence.
 
 ## Checks performed
 
 - Python AST syntax checking: all packaged Python files parsed successfully.
-- Configuration inheritance: all 14 YAML configurations resolved. One stage is 120 epochs, inputs are 768 square, and data/weight locations are relative paths.
+- Configuration inheritance: all 14 YAML configurations resolved. CuPGeo stages are 120 epochs; MixStyle/DSU baseline runs are 240 epochs. Inputs are 768 square, and data/weight locations are relative paths.
 - Ablation isolation: w/o SG differs only in `model.detach_cup_from_od`; w/o VRA changes only the geometry head, calibration switch, allocation switch, and allocation weight. Ratio weights and remaining shared objectives are preserved.
 - Dependency-free protocol tests cover common per-seed CP initialization, single-stage separation, CP reuse for the ratio sweep, the four-target evaluation matrix, and domain-before-seed aggregation.
-- Dry-run command generation passed: matched seeds 0/1/2 produce 18 training commands (3 initializers and 15 stage-2 jobs); the default single-stage set produces 9. A six-weight ratio sweep with CP reuse produces 18 further stage-2 commands. The four-target full-model evaluation plan produces 12 prediction/scoring pairs. No training or real-data evaluation commands were executed by these checks.
+- Dry-run command generation passed: matched seeds 0/1/2 produce 18 training commands (3 initializers and 15 stage-2 jobs); the default 240-epoch baseline set produces 6. A six-weight ratio sweep with CP reuse produces 18 further stage-2 commands. The four-target full-model evaluation plan produces 12 prediction/scoring pairs. No training or real-data evaluation commands were executed by these checks.
 - Focused CPU checks passed for CP, full, w/o ratio, w/o VRA, and w/o SG using a tiny backbone: architecture-compatible initialization from CP, expected newly initialized VRA tensors, finite forward outputs, and nested probabilities.
 - Direct tensor checks passed for identical SG-on/off forward values, the intended direct disc-to-cup gradient switch, zero-initialized/bounded VRA correction, and finite soft-vCDR loss gradients.
 - Copied-file source hashes and package checksums are verified by `python -m scripts.check_release`. The common scorer and probability-analysis files are identical to the selected archived sources.

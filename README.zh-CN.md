@@ -2,6 +2,7 @@
 <h1 align="center">CuPGeo</h1>
 <p align="center"><strong>Beyond Containment · 超越杯盘包含</strong></p>
 <p align="center">面向跨域视盘与视杯分割的杯保持嵌套几何框架</p>
+<p align="center"><sub>Jiaxiang Liang · Haodi An · Yuetao He · Miao Gao · Bola Nasifu · Yikemaiti Satae</sub></p>
 
 <p align="center">
   <a href="#方法概览">方法</a> ·
@@ -53,9 +54,17 @@ CuPGeo 的源域只使用 **REFUGE**：320 张训练，80 张留出用于 checkp
 
 | 论文实验 | 初始化与训练预算 | 入口 |
 | :--- | :--- | :--- |
-| 主对比（Table 1） | CuPGeo、MixStyle、DSU 分别从预训练底座训练 120 epochs | `--suite single` |
+| 主对比（Table 1） | **总计 240 epochs**：CuPGeo 复用 CP 120 + Full 120 的 checkpoint；MixStyle、DSU 各自从预训练底座训练 240 epochs | CuPGeo 用 `--suite matched`；共享骨干基线用 `--suite single` |
 | 组件消融（Table 2）及额外的 SG 对照 | CP 预训练 120 epochs；每个变体从**同 seed 的 CP 最佳 checkpoint**独立续训 120 epochs，CP-only 也续训 | `--suite matched` |
 | soft-vCDR 权重研究（源验证） | 复用匹配的 CP 初始化；0.25–3.00 共七档，2.00 对应完整模型 | `--suite matched --reuse-cp --variants ratio_025 ...` |
+
+论文 Table 1 在 240-epoch 设置下报告四域等权平均、跨 seeds 0–2 的均值 ± 样本标准差：
+
+| 方法 | Mean Dice ↑ | OC Dice ↑ | vCDR MAE ↓ | CVR (%) ↓ |
+| :--- | ---: | ---: | ---: | ---: |
+| MixStyle | 0.7375 ± 0.0070 | 0.6339 ± 0.0020 | 0.1405 ± 0.0106 | 31.30 ± 2.05 |
+| DSU | 0.7395 ± 0.0096 | 0.6362 ± 0.0026 | 0.1349 ± 0.0038 | 32.71 ± 3.57 |
+| **CuPGeo** | **0.7962 ± 0.0031** | **0.7019 ± 0.0078** | **0.0949 ± 0.0085** | **0.00 ± 0.00** |
 
 仓库内这些方法采用 seeds **0、1、2**，768×768 输入，冻结 DINOv3-L/16，最后四层 QKV 使用 rank-8 LoRA，Pyramid-FPN 解码器；fp16、batch size 4、梯度累积 4。AdamW 的 decoder/LoRA 学习率分别为 2.5×10⁻⁴ / 5×10⁻⁵，weight decay 10⁻⁴，预热 5 epochs 后余弦衰减至初始值的 10%。每一阶段都根据**源验证 Mean Dice**选 `best.pt`。其余参数见[实验协议](docs/EXPERIMENTS.md)与配置文件。
 
@@ -66,7 +75,7 @@ python -m scripts.plan_experiments --suite single --seeds 0 1 2
 python -m scripts.plan_experiments --suite matched --seeds 0 1 2
 ~~~
 
-匹配消融从同一 CP checkpoint 分别启动 **CP-only、Full、w/o ratio、w/o VRA、Full w/o SG**，不在变体之间串行继承。额外六档比例权重可用 `--reuse-cp` 复用已有 CP；[完整命令](docs/EXPERIMENTS.md#source-validation-weight-study)见实验说明。`--init-checkpoint` 只加载模型参数，开启新阶段；`--resume` 才恢复中断任务的优化器状态。
+匹配消融从同一 CP checkpoint 分别启动 **CP-only、Full、w/o ratio、w/o VRA、Full w/o SG**，不在变体之间串行继承。**Full checkpoint 同时用于 Table 1 的 CuPGeo 和 Table 2 的完整模型**；`single` 只安排 240-epoch 的 MixStyle 与 DSU。额外六档比例权重可用 `--reuse-cp` 复用已有 CP；[完整命令](docs/EXPERIMENTS.md#source-validation-weight-study)见实验说明。`--init-checkpoint` 只加载模型参数，开启新阶段；`--resume` 才恢复中断任务的优化器状态。
 
 预测与计分分别由 [<code>scripts/evaluate.py</code>](scripts/evaluate.py) 和 [<code>scripts/score_predictions.py</code>](scripts/score_predictions.py) 完成：使用相同的 0.5 阈值、单尺度、无翻转集成、无目标域适应。[四域完整评估命令](docs/EXPERIMENTS.md#frozen-four-domain-evaluation)依次生成冻结预测与离线指标；[<code>scripts/aggregate_paper_domains.py</code>](scripts/aggregate_paper_domains.py)先在每个 seed 内对四域等权平均，再计算跨 seed 均值与**样本**标准差，并核查 vCDR 有效样本数。比例代理与直径分析见 [<code>scripts/analyze_ratio_geometry.py</code>](scripts/analyze_ratio_geometry.py)。
 

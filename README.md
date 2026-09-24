@@ -6,6 +6,7 @@
   Optic Disc and Cup Segmentation
 </p>
 
+<p align="center"><sub>Jiaxiang Liang · Haodi An · Yuetao He · Miao Gao · Bola Nasifu · Yikemaiti Satae</sub></p>
 <p align="center"><sub>Source-only domain generalization · MIT-licensed research code</sub></p>
 
 <p align="center">
@@ -56,9 +57,17 @@ Datasets and the DINOv3-L/16 backbone are obtained separately. See [data prepara
 
 | Manuscript experiment | Initialization and budget | Code path |
 | :--- | :--- | :--- |
-| Main comparison (Table 1) | Separate 120-epoch source runs for CuPGeo, MixStyle, and DSU | `--suite single` |
+| Main comparison (Table 1) | **240 epochs:** CuPGeo uses the matched CP 120 + Full 120 checkpoint; MixStyle and DSU each train for 240 epochs from the pretrained backbone | `--suite matched` for CuPGeo; `--suite single` for shared-backbone baselines |
 | Component ablation (Table 2) and additional SG control | CP pretraining for 120 epochs; independent 120-epoch continuations from the **same-seed CP best checkpoint**, including CP-only | `--suite matched` |
 | Soft-vCDR weight study (source validation) | Same matched CP initialization; seven weights from 0.25 to 3.00, with 2.00 supplied by the full-model run | `--suite matched --reuse-cp --variants ratio_025 ...` |
+
+The manuscript's 240-epoch Table 1 reports four-domain equal-weight means ± sample SD over seeds 0–2 for the shared-backbone comparison:
+
+| Method | Mean Dice ↑ | OC Dice ↑ | vCDR MAE ↓ | CVR (%) ↓ |
+| :--- | ---: | ---: | ---: | ---: |
+| MixStyle | 0.7375 ± 0.0070 | 0.6339 ± 0.0020 | 0.1405 ± 0.0106 | 31.30 ± 2.05 |
+| DSU | 0.7395 ± 0.0096 | 0.6362 ± 0.0026 | 0.1349 ± 0.0038 | 32.71 ± 3.57 |
+| **CuPGeo** | **0.7962 ± 0.0031** | **0.7019 ± 0.0078** | **0.0949 ± 0.0085** | **0.00 ± 0.00** |
 
 These in-repository model runs use seeds **0, 1, 2**, 768×768 inputs, frozen DINOv3-L/16 with rank-8 QKV LoRA in the last four blocks, a Pyramid-FPN decoder, fp16, batch size 4, four-step accumulation, and AdamW. Decoder/LoRA learning rates are 2.5×10⁻⁴ / 5×10⁻⁵, with weight decay 10⁻⁴, five warmup epochs, and cosine decay to 10% of the initial rate. The source-validation **Mean Dice** selects `best.pt` in every stage. [Full hyperparameters and ablation switches](docs/EXPERIMENTS.md) are specified in the configs.
 
@@ -69,7 +78,7 @@ python -m scripts.plan_experiments --suite single --seeds 0 1 2
 python -m scripts.plan_experiments --suite matched --seeds 0 1 2
 ~~~
 
-The matched plan trains one CP initializer per seed, then launches **CP-only, full, w/o ratio, w/o VRA, and full w/o SG** separately from it. For the six additional ratio weights, use `--reuse-cp` after matched CP checkpoints exist; [the exact command](docs/EXPERIMENTS.md#source-validation-weight-study) avoids repeating CP pretraining. `--init-checkpoint` loads model weights for a fresh stage; `--resume` restores an interrupted stage, including optimizer state.
+The matched plan trains one CP initializer per seed, then launches **CP-only, full, w/o ratio, w/o VRA, and full w/o SG** separately from it. Its **Full** checkpoint supplies CuPGeo in both Tables 1 and 2. The `single` plan contains only the 240-epoch MixStyle and DSU runs. For the six additional ratio weights, use `--reuse-cp` after matched CP checkpoints exist; [the exact command](docs/EXPERIMENTS.md#source-validation-weight-study) avoids repeating CP pretraining. `--init-checkpoint` loads model weights for a fresh stage; `--resume` restores an interrupted stage, including optimizer state.
 
 ### Frozen prediction → offline scoring
 

@@ -1,6 +1,6 @@
 # Experiment-to-code map
 
-This is the executable map for the current manuscript. Run commands from the repository root. A single-stage main comparison and the matched two-stage ablation are separate experiments; their checkpoints must not be interchanged.
+This is the executable map for the current manuscript. Run commands from the repository root. Tables 1 and 2 report **240-epoch** results. Table 1 CuPGeo and Table 2 Full use the same matched Full run (CP 120 + Full 120); the in-repository MixStyle and DSU baselines each use a separate 240-epoch run from the pretrained backbone.
 
 | Experiment | Config | Initialization / budget |
 | --- | --- | --- |
@@ -10,11 +10,12 @@ This is the executable map for the current manuscript. Run commands from the rep
 | w/o ratio | `configs/cupgeo_no_ratio.yaml` | Same-seed CP best, another 120 epochs |
 | w/o VRA / CP + ratio | `configs/cupgeo_no_vra.yaml` | Same-seed CP best, another 120 epochs |
 | Full w/o SG | `configs/cupgeo_no_sg.yaml` | Same-seed CP best, SG disabled only in stage 2 |
-| Table 1: shared-backbone comparison | `cupgeo.yaml`, `mixstyle.yaml`, `dsu.yaml` | Separate 120-epoch runs; do not substitute matched-stage results |
+| Table 1: CuPGeo | `cupgeo.yaml` | Reuse matched `stage2_full/best.pt` after CP 120 + Full 120 |
+| Table 1: MixStyle / DSU | `mixstyle.yaml`, `dsu.yaml` | Separate 240-epoch runs from the pretrained backbone |
 | Source weight table | `cupgeo_ratio_025/050/100/150/250/300.yaml`, `cupgeo.yaml` for 2.00 | Seven settings, from the same-seed CP checkpoint; source validation only |
 | Ratio-proxy table | `scripts/analyze_ratio_geometry.py` | Reuse frozen Full and w/o ratio predictions; no further training |
 
-All configurations specify one 120-epoch stage. The launch command determines whether it is source training from the pretrained backbone or a second stage initialized from CP. The same YAML alone does not prove the provenance of a reported result.
+CuPGeo component configs specify one 120-epoch stage; the MixStyle and DSU configs specify 240 epochs. The launch command determines whether a CuPGeo config is CP pretraining or a second stage initialized from CP. The same YAML alone does not prove the provenance of a reported result.
 
 ## Fixed conditions
 
@@ -25,7 +26,7 @@ All configurations specify one 120-epoch stage. The launch command determines wh
 | Model | Frozen DINOv3-L/16; features from blocks 6/12/18/24; last four blocks QKV LoRA rank 8, alpha 16; Pyramid-FPN decoder |
 | Input and compute | 768×768; fp16; batch size 4; gradient accumulation 4; seeds 0/1/2 |
 | Optimizer | AdamW; decoder/LoRA LR 2.5e-4/5e-5; weight decay 1e-4; five warmup epochs and cosine decay to 10% |
-| Checkpoint | Maximize source-validation Mean Dice (`val_seg_dice`) in every 120-epoch stage |
+| Checkpoint | Maximize source-validation Mean Dice (`val_seg_dice`) for every stage or 240-epoch baseline run |
 | Full geometry | VRA weight .25, temperature .02, kappa 2, alpha initial 0; soft-vCDR weight 2, SmoothL1 transition .05; stop-gradient on disc side |
 | Shared objectives (CuPGeo variants) | Paired log-uniform scale 0.2–1.0, center jitter .2; mask equivariance .50; anatomy field .15/.20/.10; only these auxiliary losses ramp over 12 epochs |
 | Inference | Frozen checkpoint; single 768×768 view, no flip/multiscale ensemble or target adaptation; shared OD/OC threshold .5 |
@@ -61,7 +62,7 @@ CUDA_VISIBLE_DEVICES=0 python -m scripts.plan_experiments --suite single --seeds
 CUDA_VISIBLE_DEVICES=0 python -m scripts.plan_experiments --suite matched --seeds 0 1 2 --execute
 ```
 
-The `single` suite supplies only the in-repository shared-backbone methods CuPGeo, MixStyle, and DSU. Other Table 1 methods follow their own published architectures and are not silently mapped to these configs. The `matched` suite performs one CP stage 1 per seed and five independent stage-2 runs per seed.
+The `single` suite supplies the in-repository 240-epoch MixStyle and DSU runs. CuPGeo in Table 1 comes from the `matched` suite's Full checkpoint, also used in Table 2. Other Table 1 methods follow their own architectures and are not silently mapped to these configs. The `matched` suite performs one CP stage 1 per seed and five independent stage-2 runs per seed.
 
 ## Source-validation weight study
 
@@ -97,8 +98,8 @@ CUDA_VISIBLE_DEVICES=0 python -m scripts.plan_paper_evaluation --suite single --
 
 python -m scripts.aggregate_paper_domains --suite matched --variant full --method full \
   --seeds 0 1 2 --output runs/paper/matched/full_macro4.json
-python -m scripts.aggregate_paper_domains --suite single --variant full --method full \
-  --seeds 0 1 2 --output runs/paper/single/full_macro4.json
+python -m scripts.aggregate_paper_domains --suite single --variant mixstyle --method mixstyle \
+  --seeds 0 1 2 --output runs/paper/single/mixstyle_macro4.json
 ```
 
 The same aggregation command accepts any completed variant, for example `--variant no_vra --method no_vra` in the matched suite. Score summaries and per-image records are private evaluation artifacts. For ratio-proxy and diameter analyses, reuse the saved probability artifacts with `scripts.analyze_ratio_geometry` and `configs/geometry_jobs.example.json`.

@@ -250,18 +250,6 @@
       "source_sha256": "db717c73c538d4b082e0f89c021f7c17532d42da68ee7beffb29e711a491a67e"
     },
     {
-      "file": "configs/dsu.yaml",
-      "source_group": "existing_core_package",
-      "source_relative_path": "icasspcode/configs/dsu.yaml",
-      "source_sha256": "0515c1edffd01af3e8da7da8672937bf816d84dcd1a09a1fc1907a6619340bd5"
-    },
-    {
-      "file": "configs/mixstyle.yaml",
-      "source_group": "existing_core_package",
-      "source_relative_path": "icasspcode/configs/mixstyle.yaml",
-      "source_sha256": "f7d61736d546978412baa120326f90c3043b298e70a5b13ab7810e6dba67c750"
-    },
-    {
       "file": "configs/soft_topology.yaml",
       "source_group": "existing_core_package",
       "source_relative_path": "icasspcode/configs/soft_topology.yaml",
@@ -384,7 +372,9 @@
     "assets/icon-start.svg",
     "configs/cupgeo_no_sg.yaml",
     "configs/cupgeo_no_vra.yaml",
+    "configs/dsu.yaml",
     "configs/geometry_jobs.example.json",
+    "configs/mixstyle.yaml",
     "docs/DATA.md",
     "docs/EXPERIMENTS.md",
     "docs/PROVENANCE.md",

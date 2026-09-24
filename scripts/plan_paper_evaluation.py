@@ -40,7 +40,7 @@ def build_plan(suite: str, seeds: list[int], variants: list[str],
                output: Path, precision: str = "fp16") -> list[EvaluationJob]:
     if suite not in ("single", "matched"):
         raise ValueError("suite must be single or matched")
-    allowed = ("full", "mixstyle", "dsu") if suite == "single" else MATCHED + tuple(
+    allowed = ("mixstyle", "dsu") if suite == "single" else MATCHED + tuple(
         variant for variant in RATIO if variant not in MATCHED)
     if not seeds or len(set(seeds)) != len(seeds) or any(seed < 0 for seed in seeds):
         raise ValueError("Use unique, non-negative seeds")
@@ -81,7 +81,7 @@ def main() -> None:
     parser.add_argument("--precision", choices=("fp16", "bf16", "fp32"), default="fp16")
     parser.add_argument("--execute", action="store_true")
     args = parser.parse_args()
-    variants = args.variants or (["full", "mixstyle", "dsu"] if args.suite == "single" else list(MATCHED))
+    variants = args.variants or (["mixstyle", "dsu"] if args.suite == "single" else list(MATCHED))
     try:
         jobs = build_plan(args.suite, args.seeds, variants, args.output.resolve(), args.precision)
     except ValueError as exc:

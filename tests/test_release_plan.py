@@ -22,10 +22,11 @@ class ReleasePlanTests(unittest.TestCase):
                 self.assertEqual(job.command[job.command.index("--seed") + 1], str(seed))
                 self.assertEqual(job.command[job.command.index("--epochs") + 1], "120")
 
-    def test_single_stage_never_uses_cp_initialization(self):
-        jobs = build_plan("single", [0, 1, 2], ["full", "mixstyle", "dsu"], Path("runs/paper"))
-        self.assertEqual(len(jobs), 9)
+    def test_main_baselines_use_240_epochs_without_cp_initialization(self):
+        jobs = build_plan("single", [0, 1, 2], ["mixstyle", "dsu"], Path("runs/paper"))
+        self.assertEqual(len(jobs), 6)
         self.assertTrue(all("--init-checkpoint" not in job.command for job in jobs))
+        self.assertTrue(all(job.command[job.command.index("--epochs") + 1] == "240" for job in jobs))
 
     def test_reject_duplicate_seeds(self):
         with self.assertRaises(ValueError):
@@ -34,6 +35,10 @@ class ReleasePlanTests(unittest.TestCase):
     def test_reject_sg_as_single_stage_paper_protocol(self):
         with self.assertRaises(ValueError):
             build_plan("single", [0], ["no_sg"], Path("runs"))
+
+    def test_reject_single_stage_full_as_table1_checkpoint(self):
+        with self.assertRaises(ValueError):
+            build_plan("single", [0], ["full"], Path("runs"))
 
     def test_reject_duplicate_variants(self):
         with self.assertRaises(ValueError):

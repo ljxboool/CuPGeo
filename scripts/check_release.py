@@ -66,7 +66,8 @@ def main() -> None:
             ast.parse(text, filename=str(path))
     configs = {path.stem: load_config(path) for path in (ROOT / "configs").glob("*.yaml")}
     for name, cfg in configs.items():
-        assert cfg["train"]["epochs"] == 120, name
+        expected_epochs = 240 if name in {"mixstyle", "dsu"} else 120
+        assert cfg["train"]["epochs"] == expected_epochs, name
         assert cfg["train"]["selection_metric"] == "val_seg_dice", name
         assert cfg["model"]["image_size"] == 768, name
         assert cfg["data"]["source_domain"] == "REFUGE", name

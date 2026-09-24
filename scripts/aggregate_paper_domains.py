@@ -137,8 +137,8 @@ def main() -> None:
     parser.add_argument("--precision", choices=("fp16", "bf16", "fp32"), default="fp16")
     parser.add_argument("--output", type=Path, default=None, help="Optional private JSON file below runs/")
     args = parser.parse_args()
-    if args.suite == "single" and args.variant == "no_sg":
-        parser.error("w/o SG belongs to the matched second-stage comparison")
+    if args.suite == "single" and args.variant not in ("mixstyle", "dsu"):
+        parser.error("The 240-epoch single-stage suite contains MixStyle and DSU only; CuPGeo uses matched Full")
     summaries = {}
     try:
         for seed in args.seeds:

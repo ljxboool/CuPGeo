@@ -3,7 +3,8 @@
 This packaging helper does not change the archived training implementation.
 Run from the release root. A matched suite trains one CP initializer per seed,
 then initializes EVERY stage-2 variant from that same checkpoint (not from
-the preceding variant). Single-stage comparisons remain a separate suite.
+the preceding variant). Shared-backbone baseline comparisons use a separate
+240-epoch single-stage suite; Table 1 CuPGeo uses the matched Full checkpoint.
 """
 from __future__ import annotations
 
@@ -90,7 +91,7 @@ def build_plan(suite: str, seeds: list[int], variants: list[str],
         raise ValueError("--reuse-cp applies only to the matched suite")
     if not seeds or len(set(seeds)) != len(seeds) or any(s < 0 for s in seeds):
         raise ValueError("Use unique, non-negative seeds")
-    allowed = MATCHED + tuple(variant for variant in RATIO if variant not in MATCHED) if suite == "matched" else ("full", "mixstyle", "dsu", "cp", "no_ratio", "no_vra")
+    allowed = MATCHED + tuple(variant for variant in RATIO if variant not in MATCHED) if suite == "matched" else ("mixstyle", "dsu")
     if not variants or len(set(variants)) != len(variants) or any(v not in allowed for v in variants):
         raise ValueError(f"Use unique variants from {allowed}")
     jobs = []
@@ -99,7 +100,7 @@ def build_plan(suite: str, seeds: list[int], variants: list[str],
             init: Path | None = None) -> None:
         command = [sys.executable, "-m", "scripts.train_source", "--config",
                    str(ROOT / "configs" / CONFIGS[variant]), "--seed", str(seed),
-                   "--epochs", "120", "--output", str(dest)]
+                   "--epochs", "120" if suite == "matched" else "240", "--output", str(dest)]
         if init is not None:
             command += ["--init-checkpoint", str(init)]
         for option, value in (overrides or {}).items():
@@ -131,7 +132,7 @@ def main() -> None:
     parser.add_argument("--execute", action="store_true", help="Actually run training sequentially; default prints only")
     parser.add_argument("--reuse-cp", action="store_true", help="Use existing same-seed stage1_cp/best.pt; do not retrain CP")
     args = parser.parse_args()
-    variants = args.variants or (list(MATCHED) if args.suite == "matched" else ["full", "mixstyle", "dsu"])
+    variants = args.variants or (list(MATCHED) if args.suite == "matched" else ["mixstyle", "dsu"])
     overrides = {option: str(Path(value).expanduser().resolve())
                  for option in ("data-root", "train-manifest", "val-manifest", "backbone-checkpoint")
                  if (value := getattr(args, option.replace("-", "_"))) is not None}

@@ -1,8 +1,18 @@
 cff-version: 1.2.0
 message: "Please cite the CuPGeo manuscript when using this research code. Publication details are pending."
 type: software
-title: "CuPGeo: Beyond Containment: Cup-Preserving Nested Geometry for Source-Only Cross-Domain Optic Disc and Cup Segmentation"
+title: "Beyond Containment: Cup-Preserving Nested Geometry for Source-Only Cross-Domain Optic Disc and Cup Segmentation"
 authors:
   - family-names: Liang
     given-names: Jiaxiang
+  - family-names: An
+    given-names: Haodi
+  - family-names: He
+    given-names: Yuetao
+  - family-names: Gao
+    given-names: Miao
+  - family-names: Nasifu
+    given-names: Bola
+  - family-names: Satae
+    given-names: Yikemaiti
 version: 0.2.0

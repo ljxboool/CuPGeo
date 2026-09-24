@@ -17,13 +17,15 @@ class PaperEvaluationPlanTests(unittest.TestCase):
         self.assertTrue(all("stage2_" in str(job.checkpoint) for job in jobs))
 
     def test_single_stage_has_no_matched_checkpoint(self):
-        jobs = build_plan("single", [0], ["full", "mixstyle", "dsu"], Path("runs/paper"))
-        self.assertEqual(len(jobs), 12)
+        jobs = build_plan("single", [0], ["mixstyle", "dsu"], Path("runs/paper"))
+        self.assertEqual(len(jobs), 8)
         self.assertTrue(all("stage2_" not in str(job.checkpoint) for job in jobs))
 
     def test_reject_wrong_suite_variant(self):
         with self.assertRaises(ValueError):
             build_plan("single", [0], ["no_sg"], Path("runs/paper"))
+        with self.assertRaises(ValueError):
+            build_plan("single", [0], ["full"], Path("runs/paper"))
 
 
 if __name__ == "__main__":

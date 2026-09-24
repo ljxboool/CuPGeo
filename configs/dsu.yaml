@@ -35,7 +35,7 @@ model:
   boundary_aware: false
   region_conditioned_classifier: false
 train:
-  epochs: 120
+  epochs: 240
   batch_size: 4
   grad_accum_steps: 4
   lr_decoder: 0.00025
