@@ -1,3 +1,4 @@
+<p align="center"><img src="assets/cupgeo-mark.svg" alt="CuPGeo 标识" width="56" height="56"></p>
 <h1 align="center">CuPGeo</h1>
 <p align="center"><strong>Beyond Containment · 超越杯盘包含</strong></p>
 <p align="center">面向跨域视盘与视杯分割的杯保持嵌套几何框架</p>
@@ -14,7 +15,7 @@
 
 ---
 
-## 方法概览
+## <img src="assets/icon-method.svg" alt="" width="22" height="22"> 方法概览
 
 CuPGeo 以视杯为几何锚点：**VRA** 给杯位置提供有界的竖直先验，**CP** 用杯概率与残余盘缘概率构造嵌套输出，**soft-vCDR** 在源域训练时约束杯盘的相对竖直尺度。目标域只做冻结推理，不进行测试时适应。
 
@@ -30,7 +31,7 @@ CuPGeo 以视杯为几何锚点：**VRA** 给杯位置提供有界的竖直先�
 
 核心关系是 **P<sub>OD</sub> = P<sub>OC</sub> + (1 − P<sub>OC</sub>) P<sub>rim</sub>**。共同阈值下，预测的视杯始终包含在视盘内。stop-gradient 只改变训练时盘侧梯度流向，不改变前向概率。
 
-## 快速开始
+## <img src="assets/icon-start.svg" alt="" width="22" height="22"> 快速开始
 
 下面的命令安装代码、检查发布文件，并**打印**匹配消融的训练计划。没有加 <code>--execute</code> 时不会启动训练。
 
@@ -46,7 +47,7 @@ python -m scripts.plan_experiments --suite matched --seeds 0 1 2
 
 数据集和 DINOv3-L/16 底座需单独取得。准备方法见[数据说明](docs/DATA.md)，实验入口见[实验与代码对应表](docs/EXPERIMENTS.md)。原始实验底座的 SHA-256 为 <code>45172f209c9583c40538afc26b60a07033e6fcc2e8c30228338e6b2e932e7941</code>；仅下载同名新版权重不能证明初始化相同。
 
-## 论文实验协议
+## <img src="assets/icon-protocol.svg" alt="" width="22" height="22"> 论文实验协议
 
 | 实验 | 初始化 | 训练预算 | 选模 |
 | :--- | :--- | :--- | :--- |
@@ -64,7 +65,7 @@ CUDA_VISIBLE_DEVICES=0 python -m scripts.plan_experiments \
 
 训练、初始化与断点续训的直接命令见[实验说明](docs/EXPERIMENTS.md)。<code>--init-checkpoint</code> 只加载模型参数并开始全新的第二阶段；<code>--resume</code> 用于恢复中断的训练。预测与计分分别由 [<code>scripts/evaluate.py</code>](scripts/evaluate.py) 和 [<code>scripts/score_predictions.py</code>](scripts/score_predictions.py) 完成，比例代理与直径分析见 [<code>scripts/analyze_ratio_geometry.py</code>](scripts/analyze_ratio_geometry.py)。
 
-## 代码地图
+## <img src="assets/icon-map.svg" alt="" width="22" height="22"> 代码地图
 
 | 路径 | 内容 |
 | :--- | :--- |

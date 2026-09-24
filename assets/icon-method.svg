@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-labelledby="title">
+  <title id="title">Nested geometry</title>
+  <circle cx="12" cy="12" r="9" fill="none" stroke="#668593" stroke-width="1.6"/>
+  <ellipse cx="12" cy="12" rx="4.6" ry="6.4" fill="none" stroke="#b8806a" stroke-width="1.6"/>
+</svg>

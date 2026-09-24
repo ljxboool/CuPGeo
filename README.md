@@ -1,3 +1,4 @@
+<p align="center"><img src="assets/cupgeo-mark.svg" alt="CuPGeo mark" width="56" height="56"></p>
 <h1 align="center">CuPGeo</h1>
 <p align="center">
   <strong>Beyond Containment</strong><br>
@@ -17,7 +18,7 @@
 
 ---
 
-## Method
+## <img src="assets/icon-method.svg" alt="" width="22" height="22"> Method
 
 CuPGeo treats the optic cup as a geometric anchor. A vertical region allocation (VRA) head provides a bounded cup-localization prior; cup-preserving (CP) composition completes the optic disc with residual rim probability; and a differentiable soft-vCDR objective supervises their relative vertical extent. The model trains on labeled **source** images and performs frozen inference on unseen target domains.
 
@@ -33,7 +34,7 @@ CuPGeo treats the optic cup as a geometric anchor. A vertical region allocation 
 
 The central composition is **P<sub>OD</sub> = P<sub>OC</sub> + (1 − P<sub>OC</sub>) P<sub>rim</sub>**. A shared threshold therefore produces nested OD/OC masks. Stop-gradient changes the *training gradient path* through the disc side; it does not change the forward probabilities. There is no test-time adaptation or morphological post-processing in the paper protocol.
 
-## Quick start
+## <img src="assets/icon-start.svg" alt="" width="22" height="22"> Quick start
 
 The commands below install the package, validate the source release, and **print** the matched experiment plan. The planner does not train unless <code>--execute</code> is supplied.
 
@@ -49,7 +50,7 @@ python -m scripts.plan_experiments --suite matched --seeds 0 1 2
 
 Datasets and the DINOv3-L/16 backbone are obtained separately. See [data preparation](docs/DATA.md) and the [experiment map](docs/EXPERIMENTS.md) before executing training. The original backbone SHA-256 is <code>45172f209c9583c40538afc26b60a07033e6fcc2e8c30228338e6b2e932e7941</code>; a different upstream revision is not the identical initialization.
 
-## Paper protocol
+## <img src="assets/icon-protocol.svg" alt="" width="22" height="22"> Paper protocol
 
 | Experiment family | Initialization | Training budget | Checkpoint selection |
 | :--- | :--- | :--- | :--- |
@@ -87,7 +88,7 @@ python -m scripts.score_predictions \
 
 The paper uses a shared 0.5 threshold and no multi-scale/flip inference. Keep predictions and per-image scores under ignored <code>runs/</code> storage. For moment-proxy and diameter analysis, use [<code>scripts/analyze_ratio_geometry.py</code>](scripts/analyze_ratio_geometry.py) with the [example job specification](configs/geometry_jobs.example.json).
 
-## Repository map
+## <img src="assets/icon-map.svg" alt="" width="22" height="22"> Repository map
 
 | Path | Role |
 | :--- | :--- |
