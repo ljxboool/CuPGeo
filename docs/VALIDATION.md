@@ -12,7 +12,7 @@ This bundle is a source release, not a newly reproduced experiment. Publishing i
 - Focused CPU checks passed for CP, full, w/o ratio, w/o VRA, and w/o SG using a tiny backbone: architecture-compatible initialization from CP, expected newly initialized VRA tensors, finite forward outputs, and nested probabilities.
 - Direct tensor checks passed for identical SG-on/off forward values, the intended direct disc-to-cup gradient switch, zero-initialized/bounded VRA correction, and finite soft-vCDR loss gradients.
 - Copied-file source hashes and package checksums are verified by `python -m scripts.check_release`. The common scorer and probability-analysis files are identical to the selected archived sources.
-- The clean directory contains no real-data manifests, image/mask files, model weights, logs, remote server paths, or remote launchers. A basic source-pattern scan found no obvious embedded access tokens/private keys; this is not a comprehensive credential or license audit.
+- The clean directory contains no real-data manifests, retinal images/masks, model weights, logs, remote server paths, or remote launchers. The two SVGs under `assets/` are original vector documentation, not dataset samples. A basic source-pattern scan found no obvious embedded access tokens/private keys; this is not a comprehensive credential or license audit.
 
 ## Runtime boundary
 

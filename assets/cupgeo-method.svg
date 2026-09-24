@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="458" viewBox="0 0 1280 458" role="img" aria-labelledby="title desc">
+  <title id="title">CuPGeo method at a glance</title>
+  <desc id="desc">Source image features support vertical region allocation, cup-preserving nested optic disc and cup probabilities, and soft vertical cup-to-disc ratio supervision.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0A1B2C"/>
+      <stop offset="1" stop-color="#102A38"/>
+    </linearGradient>
+    <linearGradient id="retina" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F1A27D"/>
+      <stop offset=".55" stop-color="#BA5C64"/>
+      <stop offset="1" stop-color="#592F5F"/>
+    </linearGradient>
+    <linearGradient id="cup" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFCF9F"/>
+      <stop offset="1" stop-color="#FF886E"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto">
+      <path d="M1 1L7 4L1 7" fill="none" stroke="#76D8CC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect width="1280" height="458" rx="22" fill="url(#bg)"/>
+  <text x="36" y="54" fill="#F1FAFB" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="750">The geometry path</text>
+  <text x="1244" y="51" text-anchor="end" fill="#80B9C2" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" letter-spacing="2">SOURCE IMAGES IN · NESTED MASKS OUT</text>
+  <line x1="36" x2="1244" y1="75" y2="75" stroke="#6CB4B7" stroke-opacity=".24"/>
+
+  <g fill="#122F3E" stroke="#57979E" stroke-opacity=".38">
+    <rect x="30" y="100" width="268" height="277" rx="18"/>
+    <rect x="344" y="100" width="268" height="277" rx="18"/>
+    <rect x="658" y="100" width="268" height="277" rx="18"/>
+    <rect x="972" y="100" width="268" height="277" rx="18"/>
+  </g>
+  <g fill="none" stroke="#76D8CC" stroke-width="2" marker-end="url(#arrow)">
+    <path d="M305 239H334"/>
+    <path d="M619 239H648"/>
+    <path d="M933 239H962"/>
+  </g>
+
+  <!-- Shared encoder -->
+  <text x="51" y="133" fill="#6EE2D2" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="700" letter-spacing="1.5">01 / ENCODE</text>
+  <text x="51" y="169" fill="#F5FCFC" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700">DINOv3 + FPN</text>
+  <circle cx="111" cy="248" r="49" fill="url(#retina)" stroke="#FFD0AC" stroke-opacity=".62" stroke-width="2"/>
+  <path d="M81 270C102 251 109 234 140 225M84 229C103 237 125 259 145 264M109 203C111 229 120 257 121 294" fill="none" stroke="#FBE2C9" stroke-opacity=".46" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="109" cy="247" r="12" fill="#FFE7C8" opacity=".72"/>
+  <g fill="#63D8CB">
+    <rect x="184" y="214" width="12" height="68" rx="6" opacity=".42"/>
+    <rect x="204" y="226" width="12" height="56" rx="6" opacity=".62"/>
+    <rect x="224" y="205" width="12" height="77" rx="6" opacity=".82"/>
+    <rect x="244" y="235" width="12" height="47" rx="6"/>
+  </g>
+  <text x="51" y="329" fill="#B8D1D9" font-family="Arial, Helvetica, sans-serif" font-size="15">Shared multi-scale features</text>
+  <text x="51" y="349" fill="#799EAC" font-family="Arial, Helvetica, sans-serif" font-size="14">from source fundus images</text>
+
+  <!-- VRA five-region prior -->
+  <text x="365" y="133" fill="#6EE2D2" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="700" letter-spacing="1.5">02 / LOCALIZE</text>
+  <text x="365" y="169" fill="#F5FCFC" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700">Vertical allocation</text>
+  <rect x="390" y="199" width="72" height="105" rx="7" fill="#0C2634" stroke="#75D7CD" stroke-opacity=".5"/>
+  <rect x="396" y="205" width="60" height="16" rx="3" fill="#356071"/>
+  <rect x="396" y="224" width="60" height="17" rx="3" fill="#4B9E9C"/>
+  <rect x="396" y="244" width="60" height="25" rx="3" fill="url(#cup)"/>
+  <rect x="396" y="272" width="60" height="17" rx="3" fill="#4B9E9C"/>
+  <rect x="396" y="292" width="60" height="6" rx="3" fill="#356071"/>
+  <path d="M478 244H540M478 269H540" stroke="#FFB38E" stroke-width="1.5" stroke-dasharray="4 5"/>
+  <path d="M548 244V269M542 244H554M542 269H554" stroke="#FFB38E" stroke-width="2" fill="none"/>
+  <text x="484" y="228" fill="#9BC2C9" font-family="Arial, Helvetica, sans-serif" font-size="13">five regions</text>
+  <text x="365" y="329" fill="#B8D1D9" font-family="Arial, Helvetica, sans-serif" font-size="15">A bounded prior refines</text>
+  <text x="365" y="349" fill="#799EAC" font-family="Arial, Helvetica, sans-serif" font-size="14">uncertain cup logits</text>
+
+  <!-- CP nested probabilities -->
+  <text x="679" y="133" fill="#6EE2D2" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="700" letter-spacing="1.5">03 / COMPOSE</text>
+  <text x="679" y="169" fill="#F5FCFC" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700">Cup-preserving</text>
+  <ellipse cx="790" cy="244" rx="75" ry="58" fill="#235968" stroke="#74DED0" stroke-width="2.5"/>
+  <ellipse cx="790" cy="244" rx="32" ry="39" fill="url(#cup)"/>
+  <path d="M790 199V288" stroke="#FFF2D9" stroke-opacity=".65" stroke-width="1" stroke-dasharray="4 6"/>
+  <text x="679" y="329" fill="#B8D1D9" font-family="Arial, Helvetica, sans-serif" font-size="15">Nested OD / OC probabilities</text>
+  <text x="679" y="349" fill="#799EAC" font-family="Arial, Helvetica, sans-serif" font-size="14">via residual-rim completion</text>
+
+  <!-- Ratio objective -->
+  <text x="993" y="133" fill="#6EE2D2" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="700" letter-spacing="1.5">04 / SUPERVISE</text>
+  <text x="993" y="169" fill="#F5FCFC" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700">Soft vCDR</text>
+  <path d="M1027 200V294M1022 200H1032M1022 294H1032" stroke="#6FDCCF" stroke-width="3" fill="none"/>
+  <path d="M1083 219V275M1078 219H1088M1078 275H1088" stroke="#FFAC8F" stroke-width="3" fill="none"/>
+  <text x="1101" y="242" fill="#F2FBFA" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700">d<tspan baseline-shift="sub" font-size="15">cup</tspan> / d<tspan baseline-shift="sub" font-size="15">disc</tspan></text>
+  <text x="993" y="329" fill="#B8D1D9" font-family="Arial, Helvetica, sans-serif" font-size="15">Moment-ratio training</text>
+  <text x="993" y="349" fill="#799EAC" font-family="Arial, Helvetica, sans-serif" font-size="14">for vertical proportion</text>
+
+  <rect x="30" y="402" width="1220" height="36" rx="18" fill="#17414B" stroke="#50ABAC" stroke-opacity=".35"/>
+  <text x="640" y="425" text-anchor="middle" fill="#C7E5E6" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="600" letter-spacing=".35">Source-only training · paired-view supervision · nested OD / OC predictions at inference</text>
+</svg>

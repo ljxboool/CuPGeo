@@ -1,56 +1,85 @@
-# CuPGeo
+<p align="center">
+  <img src="assets/cupgeo-banner.svg" alt="CuPGeo — Cup-Preserving Nested Geometry" width="100%">
+</p>
 
-Core experimental code for **Beyond Containment: Cup-Preserving Nested Geometry for Source-Only Cross-Domain Optic Disc and Cup Segmentation**.
+<p align="center">
+  <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-5ad9c9?style=flat-square"></a>
+  <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-3776ab?style=flat-square">
+  <img alt="PyTorch research code" src="https://img.shields.io/badge/framework-PyTorch-ee7964?style=flat-square">
+  <img alt="Source-only domain generalization" src="https://img.shields.io/badge/setting-source--only%20DG-214b61?style=flat-square">
+</p>
 
-[中文说明](README.zh-CN.md) | [Experiment map](docs/EXPERIMENTS.md) | [Data preparation](docs/DATA.md) | [Provenance and release status](docs/PROVENANCE.md)
+<h3 align="center">Beyond Containment</h3>
+<p align="center">
+  Cup-Preserving Nested Geometry for Source-Only Cross-Domain<br>
+  Optic Disc and Cup Segmentation
+</p>
 
-This standalone source bundle was prepared on 2026-09-22. Use **this directory** as the repository root, not its parent historical collection. It includes CP nesting, bounded VRA localization, moment-based ratio supervision, training, frozen prediction, offline scoring, component/SG configurations, and probability-based geometry analysis. `c3tta` is the preserved Python namespace for checkpoint compatibility; the paper recipes use no test-time adaptation.
+<p align="center">
+  <a href="#method">Method</a> ·
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#paper-protocol">Paper protocol</a> ·
+  <a href="#repository-map">Code map</a> ·
+  <a href="README.zh-CN.md">中文</a>
+</p>
 
-No datasets, weights, private per-image records, server credentials, or remote launchers are bundled. Packaging does not reproduce paper scores. The source code is released under the [MIT License](LICENSE); upstream dependencies, datasets, and pretrained models retain their own terms.
+---
 
-## Install
+## Method
 
-Use Python 3.10+ and install the PyTorch/torchvision build appropriate for your hardware in an isolated environment. Then, from this directory:
+CuPGeo treats the optic cup as a geometric anchor. A vertical region allocation (VRA) head provides a bounded cup-localization prior; cup-preserving (CP) composition completes the optic disc with residual rim probability; and a differentiable soft-vCDR objective supervises their relative vertical extent. The model trains on labeled **source** images and performs frozen inference on unseen target domains.
 
-```bash
+<p align="center">
+  <img src="assets/cupgeo-method.svg" alt="CuPGeo method: shared features, vertical allocation, cup-preserving composition, and soft-vCDR supervision" width="100%">
+</p>
+
+| Geometry | What it contributes |
+| :--- | :--- |
+| **Vertical allocation** | A five-region vertical prior applies a bounded correction where cup predictions are uncertain. |
+| **Cup-preserving composition** | The disc is assembled from the cup and residual rim, giving pixelwise OD probability at least as large as OC probability. |
+| **Soft vCDR** | Moment-based vertical spreads supply differentiable ratio supervision during source training. |
+
+The central composition is **P<sub>OD</sub> = P<sub>OC</sub> + (1 − P<sub>OC</sub>) P<sub>rim</sub>**. A shared threshold therefore produces nested OD/OC masks. Stop-gradient changes the *training gradient path* through the disc side; it does not change the forward probabilities. There is no test-time adaptation or morphological post-processing in the paper protocol.
+
+## Quick start
+
+The commands below install the package, validate the source release, and **print** the matched experiment plan. The planner does not train unless <code>--execute</code> is supplied.
+
+~~~bash
+git clone https://github.com/ljxboool/CuPGeo.git
+cd CuPGeo
+
+# Install a PyTorch/torchvision build appropriate for your hardware first.
 python -m pip install -e '.[dev,analysis]'
-python -m pytest -q
-```
-
-The dependency ranges are not a lockfile of the historical training environment. Obtain the required datasets separately using [DATA.md](docs/DATA.md). Configurations use relative paths:
-
-- `data/fundus_dg`: processed REFUGE/RIGA data;
-- `manifests/source_train.csv`, `manifests/source_val.csv`: REFUGE 320/80 split;
-- `weights/dinov3/model.safetensors`: separately obtained timm-compatible DINOv3-L/16 weights.
-
-The historical backbone SHA256 is `45172f209c9583c40538afc26b60a07033e6fcc2e8c30228338e6b2e932e7941`. An arbitrary newer upstream download does not establish checkpoint identity. Dataset access, weight access, and their terms are the user's responsibility.
-
-## Training protocols
-
-Keep single-stage comparisons separate from matched component/SG ablations. Each stage allows 120 epochs and selects `best.pt` by source-validation Mean Dice; target labels are not used for selection.
-
-```bash
-# PRINT commands only; no training, dependencies, or data required.
-python -m scripts.plan_experiments --suite single --seeds 0 1 2
+python -m scripts.check_release
 python -m scripts.plan_experiments --suite matched --seeds 0 1 2
-```
+~~~
 
-The matched plan has one CP pretraining run per seed, followed by five stage-2 runs: CP-only continuation, full CuPGeo, w/o ratio, w/o VRA, and full w/o SG. Every variant starts from the **same per-seed stage-1 CP checkpoint**, not the preceding variant. SG is disabled only in stage 2. `--init-checkpoint` restarts the optimizer, schedule, and warmup; `--resume` has a different purpose.
+Datasets and the DINOv3-L/16 backbone are obtained separately. See [data preparation](docs/DATA.md) and the [experiment map](docs/EXPERIMENTS.md) before executing training. The original backbone SHA-256 is <code>45172f209c9583c40538afc26b60a07033e6fcc2e8c30228338e6b2e932e7941</code>; a different upstream revision is not the identical initialization.
 
-To run a prepared plan, explicitly add `--execute`. The helper runs jobs sequentially and refuses to overwrite existing output directories. For example, after preparing data and weights:
+## Paper protocol
 
-```bash
+| Experiment family | Initialization | Training budget | Checkpoint selection |
+| :--- | :--- | :--- | :--- |
+| Shared-backbone comparisons | Pretrained backbone | 120 epochs | Source-validation Mean Dice |
+| Component and stop-gradient ablations | Same-seed CP checkpoint after 120 epochs | Separate 120-epoch continuation for each variant, including CP-only | Source-validation Mean Dice |
+
+The matched planner schedules CP pretraining once per seed, then starts **CP-only**, **full CuPGeo**, **w/o ratio**, **w/o VRA**, and **full w/o SG** independently from that same checkpoint. It never chains one ablation into another. Target labels are used only after frozen prediction, for evaluation. The four reported target domains are **BinRushed**, **Magrabia**, **RIM-ONE DL**, and **PAPILA**; four-domain scores average domains within each seed before computing cross-seed mean and sample SD.
+
+After preparing data and weights, run the plan explicitly:
+
+~~~bash
 CUDA_VISIBLE_DEVICES=0 python -m scripts.plan_experiments \
   --suite matched --seeds 0 1 2 --execute
-```
+~~~
 
-Use `--variants full no_ratio no_vra cp` to omit the SG comparison. For interrupted jobs use the original `scripts.train_source --resume` entry point with the corresponding config/output; the planner intentionally does not guess recovery state. See [the experiment map](docs/EXPERIMENTS.md) for direct commands and ratio-weight settings.
+For a direct source-training or resumed run, use [<code>scripts/train_source.py</code>](scripts/train_source.py). <code>--init-checkpoint</code> begins a fresh second stage with model weights only; <code>--resume</code> restores an interrupted job. See [the experiment map](docs/EXPERIMENTS.md) for direct commands, ablation switches, and ratio-weight configurations.
 
-## Frozen prediction and offline scoring
+### Frozen prediction → offline scoring
 
-Example for BinRushed after matched training:
+The predictor reads images without target labels. The common scorer reads labels only after the prediction artifact has been saved.
 
-```bash
+~~~bash
 python -m scripts.evaluate --config configs/cupgeo.yaml \
   --checkpoint runs/paper/matched/seed0/stage2_full/best.pt \
   --csv manifests/fundus_dg/binrushed_test.csv --data-root data/fundus_dg \
@@ -62,28 +91,32 @@ python -m scripts.score_predictions \
   --eval-csv manifests/fundus_dg/binrushed_test.csv --data-root data/fundus_dg \
   --output-dir runs/paper/matched/seed0/stage2_full/scored/binrushed \
   --segmentation-threshold 0.5
-```
+~~~
 
-`--predictions` uses the image-only loader even if the CSV also has mask columns. Labels are read separately by the scorer. Repeat for all four target domains and all prespecified seeds. Do not enable multi-scale/flip inference for the paper protocol. Keep private prediction and scoring artifacts under ignored `runs/` storage.
+The paper uses a shared 0.5 threshold and no multi-scale/flip inference. Keep predictions and per-image scores under ignored <code>runs/</code> storage. For moment-proxy and diameter analysis, use [<code>scripts/analyze_ratio_geometry.py</code>](scripts/analyze_ratio_geometry.py) with the [example job specification](configs/geometry_jobs.example.json).
 
-## Geometry analysis
+## Repository map
 
-The archived analysis utility is included unchanged as `scripts/analyze_ratio_geometry.py`. It reads frozen 768-by-768 prediction artifacts on CPU, exports probabilities, computes ratio/diameter errors, and supports moment-proxy statistics:
+| Path | Role |
+| :--- | :--- |
+| [<code>c3tta/models/</code>](c3tta/models) | DINOv3 + LoRA backbone, Pyramid-FPN, VRA, and nested output construction |
+| [<code>c3tta/losses/</code>](c3tta/losses) | OD/OC segmentation, allocation, soft-vCDR, and shared auxiliary losses |
+| [<code>c3tta/data/</code>](c3tta/data) | Data loading, canonical masks, paired views, and geometry targets |
+| [<code>configs/</code>](configs) | Full model, ablations, shared-backbone controls, and ratio-weight settings |
+| [<code>scripts/</code>](scripts) | Data conversion, training, frozen prediction, scoring, and analysis |
+| [<code>docs/</code>](docs) | [Data](docs/DATA.md) · [experiments](docs/EXPERIMENTS.md) · [provenance](docs/PROVENANCE.md) · [validation](docs/VALIDATION.md) |
 
-```bash
-python -m scripts.analyze_ratio_geometry --spec configs/geometry_jobs.example.json \
-  --source-root . --output runs/geometry_analysis --compute-proxy
-```
+The historical <code>c3tta</code> Python namespace is retained for checkpoint compatibility. The current paper recipes use source-only training.
 
-The JSON is an **example**, not actual experiment output: supply the artifacts/manifests from your runs. It illustrates one complete four-domain seed; include every planned seed and method for paper-level mean and sample SD. The script exports FP32 probabilities from stored logits; it does not recover precision already lost in FP16 storage. The common scorer remains the primary source of reported segmentation/hard-vCDR metrics.
+## Release scope
 
-## Checks
+This repository contains **code, configurations, tests, and documentation**. It does **not** contain retinal datasets, pretrained or trained weights, per-seed checkpoints, predictions, score files, credentials, or server launch scripts. The release checker verifies syntax, configuration consistency, source hashes, and the source-only file inventory; it is not a claim that publishing the package reproduced the paper's numerical results.
 
-```bash
+~~~bash
 python -m scripts.check_release
 python -m unittest discover -s tests -p test_release_plan.py
 python -m pytest -q
 CUDA_VISIBLE_DEVICES='' OMP_NUM_THREADS=2 python -m scripts.smoke_test
-```
+~~~
 
-The first command checks syntax, portable configs, checksums, and excluded artifact types. The smoke workflow uses synthetic images and a tiny backbone, exercises CP-to-CuPGeo initialization and scoring, and **does not reproduce paper results**. It performs a small amount of CPU training only when explicitly run. Current packaging checks are documented in [VALIDATION.md](docs/VALIDATION.md).
+The smoke test uses synthetic images and a tiny backbone. Dataset access and pretrained-model terms remain with their respective providers. The source code is available under the [MIT License](LICENSE). For attribution, see [<code>CITATION.cff</code>](CITATION.cff); publication details will be added when available.

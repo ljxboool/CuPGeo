@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="348" viewBox="0 0 1280 348" role="img" aria-labelledby="title desc">
+  <title id="title">CuPGeo</title>
+  <desc id="desc">Cup-Preserving Nested Geometry for source-only optic disc and cup segmentation.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07182C"/>
+      <stop offset=".58" stop-color="#0B2336"/>
+      <stop offset="1" stop-color="#102D3A"/>
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop offset="0" stop-color="#2CCBB7" stop-opacity=".29"/>
+      <stop offset="1" stop-color="#2CCBB7" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="disc" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4BDBC7"/>
+      <stop offset="1" stop-color="#219EAA"/>
+    </linearGradient>
+    <linearGradient id="cup" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFC7A1"/>
+      <stop offset="1" stop-color="#FF846E"/>
+    </linearGradient>
+    <pattern id="grid" width="34" height="34" patternUnits="userSpaceOnUse">
+      <path d="M34 0H0V34" fill="none" stroke="#91C9CC" stroke-opacity=".065" stroke-width="1"/>
+    </pattern>
+    <filter id="soft"><feGaussianBlur stdDeviation="26"/></filter>
+  </defs>
+  <rect width="1280" height="348" rx="22" fill="url(#bg)"/>
+  <rect width="1280" height="348" rx="22" fill="url(#grid)"/>
+  <circle cx="197" cy="173" r="170" fill="url(#glow)"/>
+  <ellipse cx="1110" cy="12" rx="250" ry="90" fill="#2CCBB7" opacity=".05" filter="url(#soft)"/>
+  <path d="M0 303C211 253 377 316 590 281S1047 239 1280 277" fill="none" stroke="#5FDAC8" stroke-opacity=".1" stroke-width="1.5"/>
+  <path d="M0 326C205 276 385 343 618 307S1066 265 1280 303" fill="none" stroke="#5FDAC8" stroke-opacity=".065" stroke-width="1.5"/>
+
+  <!-- A stylized, anatomically nested optic disc and cup. -->
+  <g transform="translate(185 174)">
+    <circle r="119" fill="#0A2638" stroke="#65DCCB" stroke-opacity=".2" stroke-width="1.5"/>
+    <circle r="101" fill="none" stroke="#62C9C3" stroke-opacity=".15" stroke-width="1"/>
+    <ellipse rx="74" ry="82" fill="#174E5C" stroke="url(#disc)" stroke-width="3"/>
+    <ellipse rx="54" ry="64" fill="#133C4C" stroke="#8CE8D9" stroke-opacity=".52" stroke-width="1.5"/>
+    <ellipse rx="29" ry="43" fill="url(#cup)" opacity=".97"/>
+    <ellipse rx="18" ry="31" fill="#FFE2C0" opacity=".26"/>
+    <path d="M0-91V91" stroke="#CFFAF0" stroke-opacity=".62" stroke-width="1.5" stroke-dasharray="4 7"/>
+    <path d="M-43-43H43M-43 43H43" stroke="#FFBE9A" stroke-opacity=".66" stroke-width="1.5"/>
+    <circle cy="-43" r="4" fill="#FFE0BB"/>
+    <circle cy="43" r="4" fill="#FFE0BB"/>
+    <circle cx="-73" cy="-9" r="4" fill="#70DFCF"/>
+    <circle cx="73" cy="9" r="4" fill="#70DFCF"/>
+  </g>
+
+  <text x="338" y="109" fill="#80E7D7" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="4">ANATOMY-GUIDED DOMAIN GENERALIZATION</text>
+  <text x="332" y="203" fill="#F4FBFC" font-family="Arial, Helvetica, sans-serif" font-size="87" font-weight="800" letter-spacing="-4">CuPGeo</text>
+  <text x="338" y="247" fill="#C2D8E3" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="400">Cup-Preserving Nested Geometry</text>
+  <text x="339" y="282" fill="#87A9BA" font-family="Arial, Helvetica, sans-serif" font-size="18">Source-only cross-domain optic disc &amp; cup segmentation</text>
+
+  <g font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="700" letter-spacing="1.2">
+    <rect x="941" y="47" width="276" height="33" rx="16.5" fill="#123A46" stroke="#4ECFBD" stroke-opacity=".42"/>
+    <circle cx="961" cy="63.5" r="4" fill="#75E5D3"/>
+    <text x="974" y="69" fill="#B8E9E1">SOURCE-ONLY LEARNING</text>
+  </g>
+</svg>

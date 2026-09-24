@@ -382,6 +382,8 @@
     "LICENSE",
     "README.md",
     "README.zh-CN.md",
+    "assets/cupgeo-banner.svg",
+    "assets/cupgeo-method.svg",
     "configs/cupgeo_no_sg.yaml",
     "configs/cupgeo_no_vra.yaml",
     "configs/geometry_jobs.example.json",
