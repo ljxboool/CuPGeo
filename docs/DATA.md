@@ -2,6 +2,16 @@
 
 Obtain the original datasets separately. This repository supplies converters and manifest schemas; it does not redistribute fundus images, masks, clinical labels, or the private manifests used in the original runs.
 
+## Pretrained backbone
+
+Obtain the DINOv3-L/16 `model.safetensors` separately under its original terms and place it at `weights/dinov3/model.safetensors`. The paper initialization used SHA-256 `45172f209c9583c40538afc26b60a07033e6fcc2e8c30228338e6b2e932e7941`; check the file before training:
+
+```bash
+sha256sum weights/dinov3/model.safetensors
+```
+
+The config path is relative to the repository root. A newer same-named weight file is not automatically the same initialization.
+
 ## Five-centre archive: REFUGE, BinRushed, Magrabia
 
 The archived converter expects `Processed_Fundus_Images.zip`, Zenodo record **8009107**, with archive MD5 `a28baa241c45c95d14f9279e4c664d9a`. Extract it so that the official `<Domain>_train.csv` and `<Domain>_test.csv` files and their referenced images/masks are directly below `data/fundus_dg/extracted/`.

@@ -3,23 +3,23 @@
   "target_domains": ["binrushed", "magrabia", "rim_one", "papila"],
   "jobs": [
     {
-      "method": "CuPGeo", "seed": 0, "domain": "binrushed",
-      "artifact": "runs/paper/matched/seed0/stage2_full/binrushed.predictions.pt",
+      "method": "full", "seed": 0, "domain": "binrushed",
+      "artifact": "runs/paper/matched/seed0/stage2_full/predictions/binrushed.pt",
       "manifest": "manifests/fundus_dg/binrushed_test.csv", "data_root": "data/fundus_dg"
     },
     {
-      "method": "CuPGeo", "seed": 0, "domain": "magrabia",
-      "artifact": "runs/paper/matched/seed0/stage2_full/magrabia.predictions.pt",
+      "method": "full", "seed": 0, "domain": "magrabia",
+      "artifact": "runs/paper/matched/seed0/stage2_full/predictions/magrabia.pt",
       "manifest": "manifests/fundus_dg/magrabia_test.csv", "data_root": "data/fundus_dg"
     },
     {
-      "method": "CuPGeo", "seed": 0, "domain": "rim_one",
-      "artifact": "runs/paper/matched/seed0/stage2_full/rim_one.predictions.pt",
+      "method": "full", "seed": 0, "domain": "rim_one",
+      "artifact": "runs/paper/matched/seed0/stage2_full/predictions/rim_one.pt",
       "manifest": "manifests/rim_one_eval.csv", "data_root": "data/rim_one"
     },
     {
-      "method": "CuPGeo", "seed": 0, "domain": "papila",
-      "artifact": "runs/paper/matched/seed0/stage2_full/papila.predictions.pt",
+      "method": "full", "seed": 0, "domain": "papila",
+      "artifact": "runs/paper/matched/seed0/stage2_full/predictions/papila.pt",
       "manifest": "manifests/papila_eval.csv", "data_root": "data/papila"
     }
   ],

@@ -52,21 +52,24 @@ Datasets and the DINOv3-L/16 backbone are obtained separately. See [data prepara
 
 ## <img src="assets/icon-protocol.svg" alt="" width="22" height="22"> Paper protocol
 
-| Experiment family | Initialization | Training budget | Checkpoint selection |
-| :--- | :--- | :--- | :--- |
-| Shared-backbone comparisons | Pretrained backbone | 120 epochs | Source-validation Mean Dice |
-| Component and stop-gradient ablations | Same-seed CP checkpoint after 120 epochs | Separate 120-epoch continuation for each variant, including CP-only | Source-validation Mean Dice |
+**Training data.** REFUGE supplies 320 training images and 80 held-out images for CuPGeo checkpoint and hyperparameter selection. The four target evaluation sets are BinRushed (39), Magrabia (19), RIM-ONE DL (174), and PAPILA (84). CuPGeo uses no target image or label for training or model selection. [Prepare the exact splits](docs/DATA.md) before launching a run.
 
-The matched planner schedules CP pretraining once per seed, then starts **CP-only**, **full CuPGeo**, **w/o ratio**, **w/o VRA**, and **full w/o SG** independently from that same checkpoint. It never chains one ablation into another. Target labels are used only after frozen prediction, for evaluation. The four reported target domains are **BinRushed**, **Magrabia**, **RIM-ONE DL**, and **PAPILA**; four-domain scores average domains within each seed before computing cross-seed mean and sample SD.
+| Manuscript experiment | Initialization and budget | Code path |
+| :--- | :--- | :--- |
+| Main comparison (Table 1) | Separate 120-epoch source runs for CuPGeo, MixStyle, and DSU | `--suite single` |
+| Component ablation (Table 2) and additional SG control | CP pretraining for 120 epochs; independent 120-epoch continuations from the **same-seed CP best checkpoint**, including CP-only | `--suite matched` |
+| Soft-vCDR weight study (source validation) | Same matched CP initialization; seven weights from 0.25 to 3.00, with 2.00 supplied by the full-model run | `--suite matched --reuse-cp --variants ratio_025 ...` |
 
-After preparing data and weights, run the plan explicitly:
+These in-repository model runs use seeds **0, 1, 2**, 768×768 inputs, frozen DINOv3-L/16 with rank-8 QKV LoRA in the last four blocks, a Pyramid-FPN decoder, fp16, batch size 4, four-step accumulation, and AdamW. Decoder/LoRA learning rates are 2.5×10⁻⁴ / 5×10⁻⁵, with weight decay 10⁻⁴, five warmup epochs, and cosine decay to 10% of the initial rate. The source-validation **Mean Dice** selects `best.pt` in every stage. [Full hyperparameters and ablation switches](docs/EXPERIMENTS.md) are specified in the configs.
+
+After preparing data and the separately obtained [DINOv3 checkpoint](docs/DATA.md), inspect the training commands; add `--execute` to run them:
 
 ~~~bash
-CUDA_VISIBLE_DEVICES=0 python -m scripts.plan_experiments \
-  --suite matched --seeds 0 1 2 --execute
+python -m scripts.plan_experiments --suite single --seeds 0 1 2
+python -m scripts.plan_experiments --suite matched --seeds 0 1 2
 ~~~
 
-For a direct source-training or resumed run, use [<code>scripts/train_source.py</code>](scripts/train_source.py). <code>--init-checkpoint</code> begins a fresh second stage with model weights only; <code>--resume</code> restores an interrupted job. See [the experiment map](docs/EXPERIMENTS.md) for direct commands, ablation switches, and ratio-weight configurations.
+The matched plan trains one CP initializer per seed, then launches **CP-only, full, w/o ratio, w/o VRA, and full w/o SG** separately from it. For the six additional ratio weights, use `--reuse-cp` after matched CP checkpoints exist; [the exact command](docs/EXPERIMENTS.md#source-validation-weight-study) avoids repeating CP pretraining. `--init-checkpoint` loads model weights for a fresh stage; `--resume` restores an interrupted stage, including optimizer state.
 
 ### Frozen prediction → offline scoring
 
@@ -76,17 +79,19 @@ The predictor reads images without target labels. The common scorer reads labels
 python -m scripts.evaluate --config configs/cupgeo.yaml \
   --checkpoint runs/paper/matched/seed0/stage2_full/best.pt \
   --csv manifests/fundus_dg/binrushed_test.csv --data-root data/fundus_dg \
-  --predictions runs/paper/matched/seed0/stage2_full/binrushed.predictions.pt \
-  --artifact-method CuPGeo --precision fp16
+  --predictions runs/paper/matched/seed0/stage2_full/predictions/binrushed.pt \
+  --artifact-method full --precision fp16
 
 python -m scripts.score_predictions \
-  --prediction CuPGeo=runs/paper/matched/seed0/stage2_full/binrushed.predictions.pt \
+  --prediction full=runs/paper/matched/seed0/stage2_full/predictions/binrushed.pt \
   --eval-csv manifests/fundus_dg/binrushed_test.csv --data-root data/fundus_dg \
   --output-dir runs/paper/matched/seed0/stage2_full/scored/binrushed \
   --segmentation-threshold 0.5
 ~~~
 
 The paper uses a shared 0.5 threshold and no multi-scale/flip inference. Keep predictions and per-image scores under ignored <code>runs/</code> storage. For moment-proxy and diameter analysis, use [<code>scripts/analyze_ratio_geometry.py</code>](scripts/analyze_ratio_geometry.py) with the [example job specification](configs/geometry_jobs.example.json).
+
+Score every seed on all four targets, then run [<code>scripts/aggregate_paper_domains.py</code>](scripts/aggregate_paper_domains.py). It checks the complete seed/domain matrix, checkpoint and manifest identities, source-only inference settings, and valid vCDR counts. It averages domains **equally within each seed**, then reports the cross-seed mean and **sample** SD. [End-to-end evaluation commands](docs/EXPERIMENTS.md#frozen-four-domain-evaluation) cover every target.
 
 ## <img src="assets/icon-map.svg" alt="" width="22" height="22"> Repository map
 
@@ -96,7 +101,7 @@ The paper uses a shared 0.5 threshold and no multi-scale/flip inference. Keep pr
 | [<code>c3tta/losses/</code>](c3tta/losses) | OD/OC segmentation, allocation, soft-vCDR, and shared auxiliary losses |
 | [<code>c3tta/data/</code>](c3tta/data) | Data loading, canonical masks, paired views, and geometry targets |
 | [<code>configs/</code>](configs) | Full model, ablations, shared-backbone controls, and ratio-weight settings |
-| [<code>scripts/</code>](scripts) | Data conversion, training, frozen prediction, scoring, and analysis |
+| [<code>scripts/</code>](scripts) | Data conversion, training plans, frozen prediction, scoring, paper aggregation, and geometry analysis |
 | [<code>docs/</code>](docs) | [Data](docs/DATA.md) · [experiments](docs/EXPERIMENTS.md) · [provenance](docs/PROVENANCE.md) · [validation](docs/VALIDATION.md) |
 
 The historical <code>c3tta</code> Python namespace is retained for checkpoint compatibility. The current paper recipes use source-only training.

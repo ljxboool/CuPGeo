@@ -268,12 +268,6 @@
       "source_sha256": "900ae54ee3cef0461a19f31f899331e38e956bf03792bcc7f788e5f979881454"
     },
     {
-      "file": "docs/DATA.md",
-      "source_group": "existing_core_package",
-      "source_relative_path": "icasspcode/docs/DATA.md",
-      "source_sha256": "5d146b2eadb62ef6847892a4a29f60ee40ddf3e9c9ad6ee042493fc4692440c8"
-    },
-    {
       "file": "requirements.txt",
       "source_group": "existing_core_package",
       "source_relative_path": "icasspcode/requirements.txt",
@@ -391,12 +385,17 @@
     "configs/cupgeo_no_sg.yaml",
     "configs/cupgeo_no_vra.yaml",
     "configs/geometry_jobs.example.json",
+    "docs/DATA.md",
     "docs/EXPERIMENTS.md",
     "docs/PROVENANCE.md",
     "docs/VALIDATION.md",
     "pyproject.toml",
     "scripts/check_release.py",
+    "scripts/aggregate_paper_domains.py",
+    "scripts/plan_paper_evaluation.py",
     "scripts/plan_experiments.py",
+    "tests/test_paper_aggregation.py",
+    "tests/test_paper_evaluation_plan.py",
     "tests/test_release_plan.py"
   ],
   "not_reproduced": [

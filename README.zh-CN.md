@@ -49,21 +49,26 @@ python -m scripts.plan_experiments --suite matched --seeds 0 1 2
 
 ## <img src="assets/icon-protocol.svg" alt="" width="22" height="22"> 论文实验协议
 
-| 实验 | 初始化 | 训练预算 | 选模 |
-| :--- | :--- | :--- | :--- |
-| 共享骨干的主对比 | 预训练底座 | 120 epochs | 源验证 Mean Dice |
-| 组件与 stop-gradient 消融 | 每个 seed 对应的 CP 120-epoch checkpoint | 每个变体独立再训练 120 epochs，CP-only 也续训 | 源验证 Mean Dice |
+CuPGeo 的源域只使用 **REFUGE**：320 张训练，80 张留出用于 checkpoint 与超参数选择。四个目标评估集为 **BinRushed 39 张、Magrabia 19 张、RIM-ONE DL 174 张、PAPILA 84 张**。CuPGeo 不使用目标域图像或标注训练与选模；划分与转换见[数据准备](docs/DATA.md)。
 
-匹配消融先按 seed 各训练一次 CP，再从**同一个 CP checkpoint**分别启动 CP-only、完整 CuPGeo、w/o ratio、w/o VRA、完整模型 w/o SG；变体之间不串行继承。目标域标签仅用于冻结预测后的评估。四个目标域为 **BinRushed、Magrabia、RIM-ONE DL 和 PAPILA**；每个 seed 内先对四域等权平均，再计算跨 seed 均值与样本标准差。
+| 论文实验 | 初始化与训练预算 | 入口 |
+| :--- | :--- | :--- |
+| 主对比（Table 1） | CuPGeo、MixStyle、DSU 分别从预训练底座训练 120 epochs | `--suite single` |
+| 组件消融（Table 2）及额外的 SG 对照 | CP 预训练 120 epochs；每个变体从**同 seed 的 CP 最佳 checkpoint**独立续训 120 epochs，CP-only 也续训 | `--suite matched` |
+| soft-vCDR 权重研究（源验证） | 复用匹配的 CP 初始化；0.25–3.00 共七档，2.00 对应完整模型 | `--suite matched --reuse-cp --variants ratio_025 ...` |
 
-准备好数据和权重后，显式执行训练计划：
+仓库内这些方法采用 seeds **0、1、2**，768×768 输入，冻结 DINOv3-L/16，最后四层 QKV 使用 rank-8 LoRA，Pyramid-FPN 解码器；fp16、batch size 4、梯度累积 4。AdamW 的 decoder/LoRA 学习率分别为 2.5×10⁻⁴ / 5×10⁻⁵，weight decay 10⁻⁴，预热 5 epochs 后余弦衰减至初始值的 10%。每一阶段都根据**源验证 Mean Dice**选 `best.pt`。其余参数见[实验协议](docs/EXPERIMENTS.md)与配置文件。
+
+准备好数据与底座权重后，先查看训练命令；加入 `--execute` 才会执行：
 
 ~~~bash
-CUDA_VISIBLE_DEVICES=0 python -m scripts.plan_experiments \
-  --suite matched --seeds 0 1 2 --execute
+python -m scripts.plan_experiments --suite single --seeds 0 1 2
+python -m scripts.plan_experiments --suite matched --seeds 0 1 2
 ~~~
 
-训练、初始化与断点续训的直接命令见[实验说明](docs/EXPERIMENTS.md)。<code>--init-checkpoint</code> 只加载模型参数并开始全新的第二阶段；<code>--resume</code> 用于恢复中断的训练。预测与计分分别由 [<code>scripts/evaluate.py</code>](scripts/evaluate.py) 和 [<code>scripts/score_predictions.py</code>](scripts/score_predictions.py) 完成，比例代理与直径分析见 [<code>scripts/analyze_ratio_geometry.py</code>](scripts/analyze_ratio_geometry.py)。
+匹配消融从同一 CP checkpoint 分别启动 **CP-only、Full、w/o ratio、w/o VRA、Full w/o SG**，不在变体之间串行继承。额外六档比例权重可用 `--reuse-cp` 复用已有 CP；[完整命令](docs/EXPERIMENTS.md#source-validation-weight-study)见实验说明。`--init-checkpoint` 只加载模型参数，开启新阶段；`--resume` 才恢复中断任务的优化器状态。
+
+预测与计分分别由 [<code>scripts/evaluate.py</code>](scripts/evaluate.py) 和 [<code>scripts/score_predictions.py</code>](scripts/score_predictions.py) 完成：使用相同的 0.5 阈值、单尺度、无翻转集成、无目标域适应。[四域完整评估命令](docs/EXPERIMENTS.md#frozen-four-domain-evaluation)依次生成冻结预测与离线指标；[<code>scripts/aggregate_paper_domains.py</code>](scripts/aggregate_paper_domains.py)先在每个 seed 内对四域等权平均，再计算跨 seed 均值与**样本**标准差，并核查 vCDR 有效样本数。比例代理与直径分析见 [<code>scripts/analyze_ratio_geometry.py</code>](scripts/analyze_ratio_geometry.py)。
 
 ## <img src="assets/icon-map.svg" alt="" width="22" height="22"> 代码地图
 
@@ -73,7 +78,7 @@ CUDA_VISIBLE_DEVICES=0 python -m scripts.plan_experiments \
 | [<code>c3tta/losses/</code>](c3tta/losses) | OD/OC、VRA、soft-vCDR 及固定辅助损失 |
 | [<code>c3tta/data/</code>](c3tta/data) | 数据读取、规范化掩码、双视图增强与几何目标 |
 | [<code>configs/</code>](configs) | 完整模型、消融、共享骨干对照与比例权重 |
-| [<code>scripts/</code>](scripts) | 数据转换、训练、冻结预测、评分与分析 |
+| [<code>scripts/</code>](scripts) | 数据转换、训练计划、冻结预测、评分、论文汇总与几何分析 |
 | [<code>docs/</code>](docs) | [数据](docs/DATA.md) · [实验](docs/EXPERIMENTS.md) · [来源](docs/PROVENANCE.md) · [验证](docs/VALIDATION.md) |
 
 历史 Python 包名 <code>c3tta</code> 为 checkpoint 兼容性保留；论文方法不进行测试时自适应。
