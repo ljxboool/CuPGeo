@@ -1,0 +1,27 @@
+{
+  "description": "Illustrative paths only. One complete four-domain seed; add all planned seeds/methods for a paper-level aggregate.",
+  "target_domains": ["binrushed", "magrabia", "rim_one", "papila"],
+  "jobs": [
+    {
+      "method": "CuPGeo", "seed": 0, "domain": "binrushed",
+      "artifact": "runs/paper/matched/seed0/stage2_full/binrushed.predictions.pt",
+      "manifest": "manifests/fundus_dg/binrushed_test.csv", "data_root": "data/fundus_dg"
+    },
+    {
+      "method": "CuPGeo", "seed": 0, "domain": "magrabia",
+      "artifact": "runs/paper/matched/seed0/stage2_full/magrabia.predictions.pt",
+      "manifest": "manifests/fundus_dg/magrabia_test.csv", "data_root": "data/fundus_dg"
+    },
+    {
+      "method": "CuPGeo", "seed": 0, "domain": "rim_one",
+      "artifact": "runs/paper/matched/seed0/stage2_full/rim_one.predictions.pt",
+      "manifest": "manifests/rim_one_eval.csv", "data_root": "data/rim_one"
+    },
+    {
+      "method": "CuPGeo", "seed": 0, "domain": "papila",
+      "artifact": "runs/paper/matched/seed0/stage2_full/papila.predictions.pt",
+      "manifest": "manifests/papila_eval.csv", "data_root": "data/papila"
+    }
+  ],
+  "pairs": []
+}

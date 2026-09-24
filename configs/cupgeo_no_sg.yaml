@@ -1,0 +1,4 @@
+# Apply only in stage 2, from the same per-seed CP checkpoint as full CuPGeo.
+extends: cupgeo.yaml
+model:
+  detach_cup_from_od: false

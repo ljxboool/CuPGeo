@@ -1,0 +1,93 @@
+# Expanded from the archived experiment configuration; see docs/PROVENANCE.md.
+data:
+  root: data/fundus_dg
+  train_manifest: manifests/source_train.csv
+  val_manifest: manifests/source_val.csv
+  task: od_oc_segmentation_only
+  protocol: strict_source_only
+  source_domain: REFUGE
+model:
+  backbone: vit_large_patch16_dinov3
+  checkpoint: weights/dinov3/model.safetensors
+  image_size: 768
+  feature_indices:
+  - 5
+  - 11
+  - 17
+  - 23
+  decoder_channels: 256
+  adapter_rank: 32
+  classifier_hidden_dim: 256
+  freeze_backbone: true
+  decoder_type: pyramid_fpn
+  decoder_dropout: 0.1
+  ppm_bins:
+  - 1
+  - 2
+  - 3
+  - 6
+  lora_rank: 8
+  lora_alpha: 16
+  lora_last_blocks: 4
+  lora_targets:
+  - attn.qkv
+  lora_dropout: 0.05
+  boundary_aware: false
+  region_conditioned_classifier: false
+train:
+  epochs: 120
+  batch_size: 4
+  grad_accum_steps: 4
+  lr_decoder: 0.00025
+  lr_adapter: 0.0003
+  lr_classifier: 0.00025
+  weight_decay: 0.0001
+  seed: 0
+  num_workers: 8
+  grad_clip: 1.0
+  precision: fp16
+  gradient_checkpointing: false
+  lr_lora: 5.0e-05
+  selection_metric: val_seg_dice
+  loss:
+    seg_bce_weight: 1.0
+    seg_dice_weight: 1.0
+    cls_weight: 0.0
+    nest_weight: 0.0
+    boundary_bce_weight: 0.0
+    boundary_dice_weight: 0.0
+  lr_schedule: cosine
+  lr_warmup_epochs: 5
+  lr_min_scale: 0.1
+  augmentation:
+    flip_prob: 0.5
+    color_prob: 0.0
+    brightness_min: 1.0
+    brightness_max: 1.0
+    contrast_min: 1.0
+    contrast_max: 1.0
+    noise_prob: 0.0
+    noise_std: 0.0
+    row_noise_std: 0.0
+    channel_gain_prob: 0.0
+    channel_gain_min: 1.0
+    channel_gain_max: 1.0
+    gamma_prob: 0.0
+    gamma_min: 1.0
+    gamma_max: 1.0
+    scale_canvas_prob: 0.0
+    scale_canvas_min: 1.0
+    scale_canvas_max: 1.0
+    scale_canvas_center_jitter: 0.0
+  style_augmentation:
+    method: mixstyle
+    p: 0.5
+    alpha: 0.1
+    eps: 1.0e-06
+    global_pool: true
+    donor_policy: derangement
+    placement: pyramid_fpn_fused
+tta: {}
+hardware:
+  compile: false
+  pin_memory: true

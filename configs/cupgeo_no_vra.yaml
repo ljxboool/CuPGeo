@@ -1,0 +1,9 @@
+# CP + ratio: disable the VRA head, logit correction, and allocation loss.
+extends: cupgeo.yaml
+model:
+  vertical_geometry_head: false
+  vertical_geometry_calibration: false
+train:
+  vertical_rim_allocation:
+    enabled: false
+    weight: 0.0

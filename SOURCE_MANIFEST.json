@@ -1,0 +1,402 @@
+{
+  "schema": "cupgeo.clean_release.v1",
+  "prepared_date": "2026-09-22",
+  "version": "0.2.0",
+  "copied_files": [
+    {
+      "file": "c3tta/__init__.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/__init__.py",
+      "source_sha256": "33c76e2eb649105f4edafad911a52f29d8840964a3b1f4050a3f2c871b68a7f3"
+    },
+    {
+      "file": "c3tta/data/__init__.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/data/__init__.py",
+      "source_sha256": "607560fde213ec2cfc0a91c992ee50e36508ae85b9709cf745cd8df4e53c7f45"
+    },
+    {
+      "file": "c3tta/data/anatomy_field.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/data/anatomy_field.py",
+      "source_sha256": "b921a3f073435dc9f8252c64b9613c07b4bedade5ea4a2e5b0b01b13f3ac11e8"
+    },
+    {
+      "file": "c3tta/data/colorist.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/data/colorist.py",
+      "source_sha256": "3d7ec2ff9731bd1e305e41f60438cc3e47ca361ee155b5608cf21faba515b558"
+    },
+    {
+      "file": "c3tta/data/dataset.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/data/dataset.py",
+      "source_sha256": "f852e692a387d3ec66a37fd590b3c22f98739b92f6e35a72b0f579a32aeeeef6"
+    },
+    {
+      "file": "c3tta/data/manifest.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/data/manifest.py",
+      "source_sha256": "da1d878a879c54cf440d659fb89596973632f0a4d68849277625350f3097b390"
+    },
+    {
+      "file": "c3tta/data/synthetic.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/data/synthetic.py",
+      "source_sha256": "41c6bf081a35885707f9a2daeb2063bb7c3b35b3de61a9e764a8b3f003165b28"
+    },
+    {
+      "file": "c3tta/data/transforms.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/data/transforms.py",
+      "source_sha256": "ee91f2c37e47f13fab8438814f6441316a9dbb078bab434132247a1a3245720e"
+    },
+    {
+      "file": "c3tta/engine/__init__.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/engine/__init__.py",
+      "source_sha256": "8dce38e89372713bc0102a811bca258244f8b998921c396cbbaeaaabe194ed77"
+    },
+    {
+      "file": "c3tta/engine/common.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/engine/common.py",
+      "source_sha256": "d06daa7a41105e6ca784dd31307084da55f8195321b5cbf5bc2d3a8288d0a118"
+    },
+    {
+      "file": "c3tta/engine/evaluation.py",
+      "source_group": "archived_common_scorer",
+      "source_relative_path": "archive/2026-09-22/bropaper1_paper_only/bropaper1/experiments/mechanism_controls_20260922/scoring_source/c3tta/engine/evaluation.py",
+      "source_sha256": "79210107d0ccf4956c2249da9b6058d242353260251c266cb4618240eb34bd2c"
+    },
+    {
+      "file": "c3tta/engine/inference.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/engine/inference.py",
+      "source_sha256": "9791f46d5453f1331736f5b17a80a184cbe3d45200c9c8536008785b364271c5"
+    },
+    {
+      "file": "c3tta/engine/offline_evaluation.py",
+      "source_group": "archived_common_scorer",
+      "source_relative_path": "archive/2026-09-22/bropaper1_paper_only/bropaper1/experiments/mechanism_controls_20260922/scoring_source/c3tta/engine/offline_evaluation.py",
+      "source_sha256": "28cc831a3313bb9182a1b53b2a46a736bc972daec7adebfe5afd107c0ad9a4d0"
+    },
+    {
+      "file": "c3tta/engine/predictions.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/engine/predictions.py",
+      "source_sha256": "082dab9e20ba4f82be63a5ddbecfea71eeb5f01994c8ca59b6bf356d70a09b2d"
+    },
+    {
+      "file": "c3tta/engine/quality.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/engine/quality.py",
+      "source_sha256": "8e4177467360c50aff427fc3f750cc2c7bbeb9bf3ee916027e9e971c6b0ce875"
+    },
+    {
+      "file": "c3tta/engine/seed_aggregation.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/engine/seed_aggregation.py",
+      "source_sha256": "e1a4533e4f2f7d610f50afcdf881a2b785481f63f214445a9db2eb141928c996"
+    },
+    {
+      "file": "c3tta/losses/__init__.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/losses/__init__.py",
+      "source_sha256": "00c746a759e208328bb44e1dc91d5bc81edd24207f872080f8bf50907a3efb06"
+    },
+    {
+      "file": "c3tta/losses/anatomy_field.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/losses/anatomy_field.py",
+      "source_sha256": "6e9e4126bbf66ff39203e3cbb1108a6d6c1c8ca227d0919cb2a9137ed03faf49"
+    },
+    {
+      "file": "c3tta/losses/counterfactual.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/losses/counterfactual.py",
+      "source_sha256": "31f863d6adeefbdba3f91453297a64e8ce4c9be77ff730072859d88a813848d1"
+    },
+    {
+      "file": "c3tta/losses/hierarchy.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/losses/hierarchy.py",
+      "source_sha256": "6c3197f1e17325c7cc4de0d2f04728fc9d0dbba5163945f86f16efffb93f8526"
+    },
+    {
+      "file": "c3tta/losses/multitask.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/losses/multitask.py",
+      "source_sha256": "bc2733b6719bf496dd0094bac36e2daba5dc53e6c2e1588c0758518c90b62258"
+    },
+    {
+      "file": "c3tta/losses/scale_equivariance.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/losses/scale_equivariance.py",
+      "source_sha256": "2d532280a625f0f54258800b63b559e394bdeeda75ccca52e729e76347e5e4bd"
+    },
+    {
+      "file": "c3tta/losses/tta.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/losses/tta.py",
+      "source_sha256": "34ab28574bda688a7ecfb374a2d151cabfccc3bf2734f7e7559394da971ab903"
+    },
+    {
+      "file": "c3tta/metrics.py",
+      "source_group": "archived_common_scorer",
+      "source_relative_path": "archive/2026-09-22/bropaper1_paper_only/bropaper1/experiments/mechanism_controls_20260922/scoring_source/c3tta/metrics.py",
+      "source_sha256": "8821cabc5cfa90314c38478700c616912954e1d358d07d9eabd8e783623dee09"
+    },
+    {
+      "file": "c3tta/models/__init__.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/models/__init__.py",
+      "source_sha256": "46022bba8a06407ef6023094ea57109193e50d8630688349ed33a4fdecade1a1"
+    },
+    {
+      "file": "c3tta/models/adapters.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/models/adapters.py",
+      "source_sha256": "544299c7c3bd82f110e081ba2e2fb109cc40e0e8b4797741c4420e8224228f2a"
+    },
+    {
+      "file": "c3tta/models/backbones.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/models/backbones.py",
+      "source_sha256": "e57c751ad981b0d3da2a14ff5c57ef2d55d4534e59d0d1b15023b48eb1ab76d7"
+    },
+    {
+      "file": "c3tta/models/config.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/models/config.py",
+      "source_sha256": "298589899cdddfdba696a24ab1782361ec6c51ceec4edddda5c065062d79aa82"
+    },
+    {
+      "file": "c3tta/models/decoder.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/models/decoder.py",
+      "source_sha256": "578f719fa773ce768c0ee2c8c1af9ded3d7d0391df8a121917f20df6b1bb8a67"
+    },
+    {
+      "file": "c3tta/models/factory.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/models/factory.py",
+      "source_sha256": "2ebb62ac723d926e38947bc7624b01b9b7f8cc9318e8b894b6b82c347c90c1ff"
+    },
+    {
+      "file": "c3tta/models/multitask.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/models/multitask.py",
+      "source_sha256": "6b9f3145aca0cbee5d995a92b2d6513ec728714228c392c96b8328d6dddd5aae"
+    },
+    {
+      "file": "c3tta/models/style_augmentation.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/c3tta/models/style_augmentation.py",
+      "source_sha256": "9040eacf49c74efb8f4eefd86db1bb8ee654b5b53edeb56edf060527edd1793f"
+    },
+    {
+      "file": "configs/cp_baseline.yaml",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/configs/cp_baseline.yaml",
+      "source_sha256": "9ca630fb8012734080d0eabbb353d13623c100004554c9734e1f6623607f8907"
+    },
+    {
+      "file": "configs/cupgeo.yaml",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/configs/cupgeo.yaml",
+      "source_sha256": "7b55c1b5bb21f0f927f406701d2da97a8f7ef2a007d689349102a02c1c0eff54"
+    },
+    {
+      "file": "configs/cupgeo_no_ratio.yaml",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/configs/cupgeo_no_ratio.yaml",
+      "source_sha256": "d2d604f64e2bf8f77f62075da7323db699cb9b1bb297237b9dcc284e6fa63562"
+    },
+    {
+      "file": "configs/cupgeo_ratio_025.yaml",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/configs/cupgeo_ratio_025.yaml",
+      "source_sha256": "a58dc37afe1620041254466431f2c204bd4267f46bbbfa3e964f4096b002f820"
+    },
+    {
+      "file": "configs/cupgeo_ratio_050.yaml",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/configs/cupgeo_ratio_050.yaml",
+      "source_sha256": "f52261c526b8a43a6a72cff162a4fcbed032ce334261e93de9491d70bdef96e6"
+    },
+    {
+      "file": "configs/cupgeo_ratio_100.yaml",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/configs/cupgeo_ratio_100.yaml",
+      "source_sha256": "4c15ba9c3f958cf022e3848fd3ff8aa7526a572ab72c0acfeb03f4be1e878753"
+    },
+    {
+      "file": "configs/cupgeo_ratio_150.yaml",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/configs/cupgeo_ratio_150.yaml",
+      "source_sha256": "d9576881a47cc2bc313c412aa550b35a2ff333a2890c3d7e3e15b66b0961a1ae"
+    },
+    {
+      "file": "configs/cupgeo_ratio_250.yaml",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/configs/cupgeo_ratio_250.yaml",
+      "source_sha256": "8a805af6db4524fb0b9b8b2f820d153da095708298d032c6a19594bb103b415f"
+    },
+    {
+      "file": "configs/cupgeo_ratio_300.yaml",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/configs/cupgeo_ratio_300.yaml",
+      "source_sha256": "db717c73c538d4b082e0f89c021f7c17532d42da68ee7beffb29e711a491a67e"
+    },
+    {
+      "file": "configs/dsu.yaml",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/configs/dsu.yaml",
+      "source_sha256": "0515c1edffd01af3e8da7da8672937bf816d84dcd1a09a1fc1907a6619340bd5"
+    },
+    {
+      "file": "configs/mixstyle.yaml",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/configs/mixstyle.yaml",
+      "source_sha256": "f7d61736d546978412baa120326f90c3043b298e70a5b13ab7810e6dba67c750"
+    },
+    {
+      "file": "configs/soft_topology.yaml",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/configs/soft_topology.yaml",
+      "source_sha256": "900ae54ee3cef0461a19f31f899331e38e956bf03792bcc7f788e5f979881454"
+    },
+    {
+      "file": "docs/DATA.md",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/docs/DATA.md",
+      "source_sha256": "5d146b2eadb62ef6847892a4a29f60ee40ddf3e9c9ad6ee042493fc4692440c8"
+    },
+    {
+      "file": "requirements.txt",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/requirements.txt",
+      "source_sha256": "df6a71781397c92a0603071739d6cb91b998f458db408aaff5ffe8a4be754cbf"
+    },
+    {
+      "file": "scripts/__init__.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/scripts/__init__.py",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "scripts/aggregate_source_method_seeds.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/scripts/aggregate_source_method_seeds.py",
+      "source_sha256": "be722bfce672a79ac014cab43cae069f8b4aeee1a0bf314700e76651c9f0c197"
+    },
+    {
+      "file": "scripts/analyze_ratio_geometry.py",
+      "source_group": "archived_probability_analysis",
+      "source_relative_path": "archive/2026-09-22/bropaper1_paper_only/bropaper1/experiments/mechanism_controls_20260922/analysis/analyze_predictions.py",
+      "source_sha256": "9e7a3d08a4e61ca1a3fa9474808fb1ac3fe4269d5f2791a1321622716f98b747"
+    },
+    {
+      "file": "scripts/build_fundus_dg_protocol.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/scripts/build_fundus_dg_protocol.py",
+      "source_sha256": "a848f7030546e7ef62b040261cba4e64413046767999c86239aff1a47be879a2"
+    },
+    {
+      "file": "scripts/evaluate.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/scripts/evaluate.py",
+      "source_sha256": "9c04f6b68ce3084a03ca99f62f7fa712cc811eabd14d13bc605eea969d57dfe1"
+    },
+    {
+      "file": "scripts/make_frozen_backbone_delta.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/scripts/make_frozen_backbone_delta.py",
+      "source_sha256": "0267c95dd6d0dbfebfbac94c1904a56d56ae11bf44bb3cb76c75b635e6c0eca8"
+    },
+    {
+      "file": "scripts/prepare_fundus_dg_5centre.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/scripts/prepare_fundus_dg_5centre.py",
+      "source_sha256": "23b55d90545a409e917d7ac0bb85f2a0f458760c285d3e4f5af85fad5c19f940"
+    },
+    {
+      "file": "scripts/prepare_papila.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/scripts/prepare_papila.py",
+      "source_sha256": "cbea56b5cfc64000645d52a5c42aed368e579f5ca84482e46b795dd7b1de3856"
+    },
+    {
+      "file": "scripts/prepare_rim_one.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/scripts/prepare_rim_one.py",
+      "source_sha256": "6e3541d9646909f8989594ca997dab7b8effe3ad348bdb60f347c0603d62869e"
+    },
+    {
+      "file": "scripts/score_predictions.py",
+      "source_group": "archived_common_scorer",
+      "source_relative_path": "archive/2026-09-22/bropaper1_paper_only/bropaper1/experiments/mechanism_controls_20260922/scoring_source/scripts/score_predictions.py",
+      "source_sha256": "e3a6bb9f18578b3f860edded9304969d88a40fe612bfa8f96861621ff5357f0b"
+    },
+    {
+      "file": "scripts/smoke_test.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/scripts/smoke_test.py",
+      "source_sha256": "1ee704aecb1be2d918d1feb163bf241fe69895f7025c1e61b20a90452d010c20"
+    },
+    {
+      "file": "scripts/train_source.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/scripts/train_source.py",
+      "source_sha256": "135a21a26f5906466c65c4fd143098ce0169c004989c3b97020d6fb94f534eae"
+    },
+    {
+      "file": "scripts/validate_manifest.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/scripts/validate_manifest.py",
+      "source_sha256": "1d8c19056e05ea73bc21b4f29a0322c36e9be99db8d362d6865ce1cd523df592"
+    },
+    {
+      "file": "tests/test_dafl_geometry_coupling.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/tests/test_dafl_geometry_coupling.py",
+      "source_sha256": "b7cddf8b9e493bee8d8962c0f74fdad11bc6250f22018ff7baea67c394ea3cd0"
+    },
+    {
+      "file": "tests/test_hierarchy_v2.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/tests/test_hierarchy_v2.py",
+      "source_sha256": "8fae8a2311ab0688ed81bb9ef5ae2d39e3be839654c8d5d4e0d3e40af8a2b44e"
+    },
+    {
+      "file": "tests/test_vertical_geometry_vra.py",
+      "source_group": "existing_core_package",
+      "source_relative_path": "icasspcode/tests/test_vertical_geometry_vra.py",
+      "source_sha256": "6bc1b4ab2d11d0f0827f3a77f9bbb299d8ff84907d68ed3e90bd50694468132f"
+    }
+  ],
+  "new_or_adapted_packaging_files": [
+    ".gitignore",
+    "CITATION.cff",
+    "LICENSE",
+    "README.md",
+    "README.zh-CN.md",
+    "configs/cupgeo_no_sg.yaml",
+    "configs/cupgeo_no_vra.yaml",
+    "configs/geometry_jobs.example.json",
+    "docs/EXPERIMENTS.md",
+    "docs/PROVENANCE.md",
+    "docs/VALIDATION.md",
+    "pyproject.toml",
+    "scripts/check_release.py",
+    "scripts/plan_experiments.py",
+    "tests/test_release_plan.py"
+  ],
+  "not_reproduced": [
+    "full training",
+    "paper metrics",
+    "external baselines"
+  ],
+  "publication_scope": "source-only; excludes datasets, weights, and per-seed experiment outputs"
+}
