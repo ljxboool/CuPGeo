@@ -1,19 +1,11 @@
+<h1 align="center">CuPGeo</h1>
 <p align="center">
-  <img src="assets/cupgeo-banner.svg" alt="CuPGeo — Cup-Preserving Nested Geometry" width="100%">
-</p>
-
-<p align="center">
-  <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-5ad9c9?style=flat-square"></a>
-  <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-3776ab?style=flat-square">
-  <img alt="PyTorch research code" src="https://img.shields.io/badge/framework-PyTorch-ee7964?style=flat-square">
-  <img alt="Source-only domain generalization" src="https://img.shields.io/badge/setting-source--only%20DG-214b61?style=flat-square">
-</p>
-
-<h3 align="center">Beyond Containment</h3>
-<p align="center">
+  <strong>Beyond Containment</strong><br>
   Cup-Preserving Nested Geometry for Source-Only Cross-Domain<br>
   Optic Disc and Cup Segmentation
 </p>
+
+<p align="center"><sub>Source-only domain generalization · MIT-licensed research code</sub></p>
 
 <p align="center">
   <a href="#method">Method</a> ·

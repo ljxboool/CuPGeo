@@ -1,15 +1,5 @@
-<p align="center">
-  <img src="assets/cupgeo-banner.svg" alt="CuPGeo：杯保持嵌套几何" width="100%">
-</p>
-
-<p align="center">
-  <a href="LICENSE"><img alt="MIT 许可证" src="https://img.shields.io/badge/license-MIT-5ad9c9?style=flat-square"></a>
-  <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-3776ab?style=flat-square">
-  <img alt="PyTorch 研究代码" src="https://img.shields.io/badge/framework-PyTorch-ee7964?style=flat-square">
-  <img alt="源域训练" src="https://img.shields.io/badge/setting-source--only%20DG-214b61?style=flat-square">
-</p>
-
-<h3 align="center">Beyond Containment · 超越杯盘包含</h3>
+<h1 align="center">CuPGeo</h1>
+<p align="center"><strong>Beyond Containment · 超越杯盘包含</strong></p>
 <p align="center">面向跨域视盘与视杯分割的杯保持嵌套几何框架</p>
 
 <p align="center">
@@ -19,6 +9,8 @@
   <a href="#代码地图">代码地图</a> ·
   <a href="README.md">English</a>
 </p>
+
+<p align="center"><sub>源域训练 · MIT 开源研究代码</sub></p>
 
 ---
 
