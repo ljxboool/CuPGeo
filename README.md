@@ -6,8 +6,9 @@
   Optic Disc and Cup Segmentation
 </p>
 
-<p align="center"><sub>Jiaxiang Liang · Haodi An · Yuetao He · Miao Gao · Bola Nasifu · Yikemaiti Satae</sub></p>
+<p align="center"><sub>Jiaxiang Liang · Haodi An · Yuetao He · Miao Gao · Bola Nasifu · Yikemaiti Sataer</sub></p>
 <p align="center"><sub>Source-only domain generalization · MIT-licensed research code</sub></p>
+<p align="center"><a href="https://github.com/ljxboool/CuPGeo/actions/workflows/source-checks.yml"><img src="https://github.com/ljxboool/CuPGeo/actions/workflows/source-checks.yml/badge.svg" alt="Source checks"></a></p>
 
 <p align="center">
   <a href="#method">Method</a> ·
@@ -44,9 +45,9 @@ git clone https://github.com/ljxboool/CuPGeo.git
 cd CuPGeo
 
 # Install a PyTorch/torchvision build appropriate for your hardware first.
-python -m pip install -e '.[dev,analysis]'
-python -m scripts.check_release
-python -m scripts.plan_experiments --suite matched --seeds 0 1 2
+python3 -m pip install -e '.[dev,analysis]'
+python3 -m scripts.check_release
+python3 -m scripts.plan_experiments --suite matched --seeds 0 1 2
 ~~~
 
 Datasets and the DINOv3-L/16 backbone are obtained separately. See [data preparation](docs/DATA.md) and the [experiment map](docs/EXPERIMENTS.md) before executing training. The original backbone SHA-256 is <code>45172f209c9583c40538afc26b60a07033e6fcc2e8c30228338e6b2e932e7941</code>; a different upstream revision is not the identical initialization.
@@ -58,8 +59,10 @@ Datasets and the DINOv3-L/16 backbone are obtained separately. See [data prepara
 | Manuscript experiment | Initialization and budget | Code path |
 | :--- | :--- | :--- |
 | Main comparison (Table 1) | **240 epochs:** CuPGeo uses the matched CP 120 + Full 120 checkpoint; MixStyle and DSU each train for 240 epochs from the pretrained backbone | `--suite matched` for CuPGeo; `--suite single` for shared-backbone baselines |
-| Component ablation (Table 2) and additional SG control | CP pretraining for 120 epochs; independent 120-epoch continuations from the **same-seed CP best checkpoint**, including CP-only | `--suite matched` |
-| Soft-vCDR weight study (source validation) | Same matched CP initialization; seven weights from 0.25 to 3.00, with 2.00 supplied by the full-model run | `--suite matched --reuse-cp --variants ratio_025 ...` |
+| Component ablation (Table 2) | CP pretraining for 120 epochs; independent 120-epoch continuations from the **same-seed CP best checkpoint**, including CP-only | `--suite matched` |
+| Stop-gradient ablation (Table 3) | The Full and w/o SG continuations share the same-seed CP initialization and all other objectives | `--suite matched --variants full no_sg` |
+| Soft-vCDR weight study (Table 4, source validation) | Same matched CP initialization; seven weights from 0.25 to 3.00, with 2.00 supplied by the full-model run | `--suite matched --reuse-cp --variants ratio_025 ...` |
+| Ratio-proxy validation (Table 5) | Reuse frozen Full and w/o ratio predictions; no additional training | `scripts/analyze_ratio_geometry.py` |
 
 The manuscript's 240-epoch Table 1 reports four-domain equal-weight means ± sample SD over seeds 0–2 for the shared-backbone comparison:
 
@@ -74,8 +77,8 @@ These in-repository model runs use seeds **0, 1, 2**, 768×768 inputs, frozen DI
 After preparing data and the separately obtained [DINOv3 checkpoint](docs/DATA.md), inspect the training commands; add `--execute` to run them:
 
 ~~~bash
-python -m scripts.plan_experiments --suite single --seeds 0 1 2
-python -m scripts.plan_experiments --suite matched --seeds 0 1 2
+python3 -m scripts.plan_experiments --suite single --seeds 0 1 2
+python3 -m scripts.plan_experiments --suite matched --seeds 0 1 2
 ~~~
 
 The matched plan trains one CP initializer per seed, then launches **CP-only, full, w/o ratio, w/o VRA, and full w/o SG** separately from it. Its **Full** checkpoint supplies CuPGeo in both Tables 1 and 2. The `single` plan contains only the 240-epoch MixStyle and DSU runs. For the six additional ratio weights, use `--reuse-cp` after matched CP checkpoints exist; [the exact command](docs/EXPERIMENTS.md#source-validation-weight-study) avoids repeating CP pretraining. `--init-checkpoint` loads model weights for a fresh stage; `--resume` restores an interrupted stage, including optimizer state.
@@ -85,20 +88,20 @@ The matched plan trains one CP initializer per seed, then launches **CP-only, fu
 The predictor reads images without target labels. The common scorer reads labels only after the prediction artifact has been saved.
 
 ~~~bash
-python -m scripts.evaluate --config configs/cupgeo.yaml \
+python3 -m scripts.evaluate --config configs/cupgeo.yaml \
   --checkpoint runs/paper/matched/seed0/stage2_full/best.pt \
   --csv manifests/fundus_dg/binrushed_test.csv --data-root data/fundus_dg \
   --predictions runs/paper/matched/seed0/stage2_full/predictions/binrushed.pt \
   --artifact-method full --precision fp16
 
-python -m scripts.score_predictions \
+python3 -m scripts.score_predictions \
   --prediction full=runs/paper/matched/seed0/stage2_full/predictions/binrushed.pt \
   --eval-csv manifests/fundus_dg/binrushed_test.csv --data-root data/fundus_dg \
   --output-dir runs/paper/matched/seed0/stage2_full/scored/binrushed \
   --segmentation-threshold 0.5
 ~~~
 
-The paper uses a shared 0.5 threshold and no multi-scale/flip inference. Keep predictions and per-image scores under ignored <code>runs/</code> storage. For moment-proxy and diameter analysis, use [<code>scripts/analyze_ratio_geometry.py</code>](scripts/analyze_ratio_geometry.py) with the [example job specification](configs/geometry_jobs.example.json).
+The paper uses a shared 0.5 threshold and no multi-scale/flip inference. Keep predictions and per-image scores under ignored <code>runs/</code> storage. For moment-proxy and diameter analysis, use [<code>scripts/analyze_ratio_geometry.py</code>](scripts/analyze_ratio_geometry.py) with the [example job specification](configs/geometry_jobs.example.json); a complete invocation is in the [experiment guide](docs/EXPERIMENTS.md#ratio-proxy-and-diameter-analysis).
 
 Score every seed on all four targets, then run [<code>scripts/aggregate_paper_domains.py</code>](scripts/aggregate_paper_domains.py). It checks the complete seed/domain matrix, checkpoint and manifest identities, source-only inference settings, and valid vCDR counts. It averages domains **equally within each seed**, then reports the cross-seed mean and **sample** SD. [End-to-end evaluation commands](docs/EXPERIMENTS.md#frozen-four-domain-evaluation) cover every target.
 
@@ -119,11 +122,13 @@ The historical <code>c3tta</code> Python namespace is retained for checkpoint co
 
 This repository contains **code, configurations, tests, and documentation**. It does **not** contain retinal datasets, pretrained or trained weights, per-seed checkpoints, predictions, score files, credentials, or server launch scripts. The release checker verifies syntax, configuration consistency, source hashes, and the source-only file inventory; it is not a claim that publishing the package reproduced the paper's numerical results.
 
+The lightweight [source checks](.github/workflows/source-checks.yml) run automatically on pushes and pull requests. They check the release inventory and the paper's training/evaluation plans without downloading datasets or model weights.
+
 ~~~bash
-python -m scripts.check_release
-python -m unittest discover -s tests -p test_release_plan.py
-python -m pytest -q
-CUDA_VISIBLE_DEVICES='' OMP_NUM_THREADS=2 python -m scripts.smoke_test
+python3 -m scripts.check_release
+python3 -m unittest discover -s tests -p test_release_plan.py
+python3 -m pytest -q
+CUDA_VISIBLE_DEVICES='' OMP_NUM_THREADS=2 python3 -m scripts.smoke_test
 ~~~
 
 The smoke test uses synthetic images and a tiny backbone. Dataset access and pretrained-model terms remain with their respective providers. The source code is available under the [MIT License](LICENSE). For attribution, see [<code>CITATION.cff</code>](CITATION.cff); publication details will be added when available.

@@ -9,8 +9,10 @@ import ast
 import copy
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
+import subprocess
 
 import yaml
 
@@ -24,6 +26,29 @@ def package_files() -> list[Path]:
     return sorted(p for p in ROOT.rglob("*") if p.is_file()
                   and not any(part in EXCLUDED_DIRS or part.endswith(".egg-info") for part in p.relative_to(ROOT).parts)
                   and p.relative_to(ROOT).parts[0] not in PRIVATE_ROOTS)
+
+
+def require(condition: bool, message: object) -> None:
+    """Keep release checks active even when Python runs with -O."""
+    if not condition:
+        raise ValueError(str(message))
+
+
+def private_release_paths() -> list[Path]:
+    """Inspect Git's release inventory, or every private root in a source archive."""
+    if (ROOT / ".git").exists():
+        result = subprocess.run(
+            ["git", "-C", str(ROOT), "ls-files", "--cached", "-z"],
+            check=True, capture_output=True,
+        )
+        paths = [Path(os.fsdecode(name)) for name in result.stdout.split(b"\0") if name]
+    else:
+        paths = [Path(name) for name in PRIVATE_ROOTS if (ROOT / name).is_symlink()]
+        paths += [path.relative_to(ROOT) for name in PRIVATE_ROOTS
+                  for path in (ROOT / name).rglob("*") if path.is_file() or path.is_symlink()]
+    return [path for path in paths if path.parts[0] in PRIVATE_ROOTS
+            or path.suffix.lower() in FORBIDDEN_SUFFIXES
+            or path.name.startswith(".env") or (ROOT / path).is_symlink()]
 
 
 def merge(left: dict, right: dict) -> dict:
@@ -54,50 +79,53 @@ def differences(left: dict, right: dict, prefix: str = "") -> set[str]:
 
 
 def main() -> None:
+    private_paths = private_release_paths()
+    require(not private_paths, "Private files in release inventory: "
+            + ", ".join(str(path) for path in private_paths[:10]))
     files = package_files()
     for path in files:
-        assert not path.is_symlink(), f"Symlink in release: {path.relative_to(ROOT)}"
-        assert path.suffix.lower() not in FORBIDDEN_SUFFIXES, f"Private/binary artifact: {path.name}"
-        assert not path.name.startswith(".env"), f"Environment file: {path.name}"
-        assert path.stat().st_size < 2_000_000, f"Unexpected large file: {path.name}"
+        require(not path.is_symlink(), f"Symlink in release: {path.relative_to(ROOT)}")
+        require(path.suffix.lower() not in FORBIDDEN_SUFFIXES, f"Private/binary artifact: {path.name}")
+        require(not path.name.startswith(".env"), f"Environment file: {path.name}")
+        require(path.stat().st_size < 2_000_000, f"Unexpected large file: {path.name}")
         text = path.read_text(encoding="utf-8")
-        assert not re.search(r"-----BEGIN (?:RSA |OPENSSH |EC )?PRIVATE KEY-----", text), path.name
+        require(not re.search(r"-----BEGIN (?:RSA |OPENSSH |EC )?PRIVATE KEY-----", text), path.name)
         if path.suffix == ".py":
             ast.parse(text, filename=str(path))
     configs = {path.stem: load_config(path) for path in (ROOT / "configs").glob("*.yaml")}
     for name, cfg in configs.items():
         expected_epochs = 240 if name in {"mixstyle", "dsu"} else 120
-        assert cfg["train"]["epochs"] == expected_epochs, name
-        assert cfg["train"]["selection_metric"] == "val_seg_dice", name
-        assert cfg["model"]["image_size"] == 768, name
-        assert cfg["data"]["source_domain"] == "REFUGE", name
+        require(cfg["train"]["epochs"] == expected_epochs, name)
+        require(cfg["train"]["selection_metric"] == "val_seg_dice", name)
+        require(cfg["model"]["image_size"] == 768, name)
+        require(cfg["data"]["source_domain"] == "REFUGE", name)
         for value in (cfg["data"]["root"], cfg["data"]["train_manifest"], cfg["data"]["val_manifest"], cfg["model"]["checkpoint"]):
-            assert not Path(value).is_absolute(), (name, "nonportable path")
+            require(not Path(value).is_absolute(), (name, "nonportable path"))
     full = configs["cupgeo"]
-    assert differences(full, configs["cupgeo_no_sg"]) == {"model.detach_cup_from_od"}
-    assert configs["cupgeo_no_sg"]["model"]["detach_cup_from_od"] is False
-    assert differences(full, configs["cupgeo_no_vra"]) == {
+    require(differences(full, configs["cupgeo_no_sg"]) == {"model.detach_cup_from_od"}, "w/o SG differs beyond stop-gradient")
+    require(configs["cupgeo_no_sg"]["model"]["detach_cup_from_od"] is False, "w/o SG still enables stop-gradient")
+    require(differences(full, configs["cupgeo_no_vra"]) == {
         "model.vertical_geometry_head", "model.vertical_geometry_calibration",
-        "train.vertical_rim_allocation.enabled", "train.vertical_rim_allocation.weight"}
+        "train.vertical_rim_allocation.enabled", "train.vertical_rim_allocation.weight"}, "w/o VRA changes unrelated settings")
     for name in ("cupgeo", "cupgeo_no_ratio", "cupgeo_no_vra", "cp_baseline"):
-        assert configs[name]["model"]["detach_cup_from_od"] is True, name
-    assert configs["cupgeo_no_ratio"]["train"]["loss"].get("vcdr_weight", 0) == 0
-    assert configs["cp_baseline"]["train"]["loss"].get("vcdr_weight", 0) == 0
+        require(configs[name]["model"]["detach_cup_from_od"] is True, name)
+    require(configs["cupgeo_no_ratio"]["train"]["loss"].get("vcdr_weight", 0) == 0, "w/o ratio enables ratio loss")
+    require(configs["cp_baseline"]["train"]["loss"].get("vcdr_weight", 0) == 0, "CP enables ratio loss")
     checksums = {}
     for line in (ROOT / "SHA256SUMS").read_text().splitlines():
         digest, name = line.split("  ", 1)
-        assert name not in checksums, f"Duplicate checksum entry: {name}"
+        require(name not in checksums, f"Duplicate checksum entry: {name}")
         checksums[name] = digest
     actual = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
               for p in files if p.name != "SHA256SUMS"}
-    assert actual == checksums, "File inventory/checksums differ from prepared release"
+    require(actual == checksums, "File inventory/checksums differ from prepared release")
     manifest = json.loads((ROOT / "SOURCE_MANIFEST.json").read_text())
     for item in manifest["copied_files"]:
-        assert actual[item["file"]] == item["source_sha256"], item["file"]
+        require(actual[item["file"]] == item["source_sha256"], item["file"])
     print(f"PASS: {sum(p.suffix == '.py' for p in files)} Python files parse; {len(configs)} configs resolve")
     print(f"PASS: stage-2 ablation switches and relative data/weight paths; {len(checksums)} checksums")
     print(f"PASS: {len(manifest['copied_files'])} copied files match their recorded source hashes")
-    print("Checked tracked source content only; ignored local runs/data are not release artifacts.")
+    print("Checked release content and Git-tracked paths; ignored local runs/data are not release artifacts.")
     print("This does not validate full training, numerical reproduction, credentials, or licensing.")
 
 

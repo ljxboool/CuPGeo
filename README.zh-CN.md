@@ -2,7 +2,7 @@
 <h1 align="center">CuPGeo</h1>
 <p align="center"><strong>Beyond Containment · 超越杯盘包含</strong></p>
 <p align="center">面向跨域视盘与视杯分割的杯保持嵌套几何框架</p>
-<p align="center"><sub>Jiaxiang Liang · Haodi An · Yuetao He · Miao Gao · Bola Nasifu · Yikemaiti Satae</sub></p>
+<p align="center"><sub>Jiaxiang Liang · Haodi An · Yuetao He · Miao Gao · Bola Nasifu · Yikemaiti Sataer</sub></p>
 
 <p align="center">
   <a href="#方法概览">方法</a> ·
@@ -13,6 +13,7 @@
 </p>
 
 <p align="center"><sub>源域训练 · MIT 开源研究代码</sub></p>
+<p align="center"><a href="https://github.com/ljxboool/CuPGeo/actions/workflows/source-checks.yml"><img src="https://github.com/ljxboool/CuPGeo/actions/workflows/source-checks.yml/badge.svg" alt="源码检查"></a></p>
 
 ---
 
@@ -41,9 +42,9 @@ git clone https://github.com/ljxboool/CuPGeo.git
 cd CuPGeo
 
 # 先安装与你的硬件匹配的 PyTorch / torchvision。
-python -m pip install -e '.[dev,analysis]'
-python -m scripts.check_release
-python -m scripts.plan_experiments --suite matched --seeds 0 1 2
+python3 -m pip install -e '.[dev,analysis]'
+python3 -m scripts.check_release
+python3 -m scripts.plan_experiments --suite matched --seeds 0 1 2
 ~~~
 
 数据集和 DINOv3-L/16 底座需单独取得。准备方法见[数据说明](docs/DATA.md)，实验入口见[实验与代码对应表](docs/EXPERIMENTS.md)。原始实验底座的 SHA-256 为 <code>45172f209c9583c40538afc26b60a07033e6fcc2e8c30228338e6b2e932e7941</code>；仅下载同名新版权重不能证明初始化相同。
@@ -55,8 +56,10 @@ CuPGeo 的源域只使用 **REFUGE**：320 张训练，80 张留出用于 checkp
 | 论文实验 | 初始化与训练预算 | 入口 |
 | :--- | :--- | :--- |
 | 主对比（Table 1） | **总计 240 epochs**：CuPGeo 复用 CP 120 + Full 120 的 checkpoint；MixStyle、DSU 各自从预训练底座训练 240 epochs | CuPGeo 用 `--suite matched`；共享骨干基线用 `--suite single` |
-| 组件消融（Table 2）及额外的 SG 对照 | CP 预训练 120 epochs；每个变体从**同 seed 的 CP 最佳 checkpoint**独立续训 120 epochs，CP-only 也续训 | `--suite matched` |
-| soft-vCDR 权重研究（源验证） | 复用匹配的 CP 初始化；0.25–3.00 共七档，2.00 对应完整模型 | `--suite matched --reuse-cp --variants ratio_025 ...` |
+| 组件消融（Table 2） | CP 预训练 120 epochs；每个变体从**同 seed 的 CP 最佳 checkpoint**独立续训 120 epochs，CP-only 也续训 | `--suite matched` |
+| stop-gradient 消融（Table 3） | Full 与 w/o SG 从相同 seed 的 CP checkpoint 出发，其余目标一致 | `--suite matched --variants full no_sg` |
+| soft-vCDR 权重研究（Table 4，源验证） | 复用匹配的 CP 初始化；0.25–3.00 共七档，2.00 对应完整模型 | `--suite matched --reuse-cp --variants ratio_025 ...` |
+| 比例代理验证（Table 5） | 复用 Full 和 w/o ratio 的冻结预测，不额外训练 | `scripts/analyze_ratio_geometry.py` |
 
 论文 Table 1 在 240-epoch 设置下报告四域等权平均、跨 seeds 0–2 的均值 ± 样本标准差：
 
@@ -71,13 +74,13 @@ CuPGeo 的源域只使用 **REFUGE**：320 张训练，80 张留出用于 checkp
 准备好数据与底座权重后，先查看训练命令；加入 `--execute` 才会执行：
 
 ~~~bash
-python -m scripts.plan_experiments --suite single --seeds 0 1 2
-python -m scripts.plan_experiments --suite matched --seeds 0 1 2
+python3 -m scripts.plan_experiments --suite single --seeds 0 1 2
+python3 -m scripts.plan_experiments --suite matched --seeds 0 1 2
 ~~~
 
 匹配消融从同一 CP checkpoint 分别启动 **CP-only、Full、w/o ratio、w/o VRA、Full w/o SG**，不在变体之间串行继承。**Full checkpoint 同时用于 Table 1 的 CuPGeo 和 Table 2 的完整模型**；`single` 只安排 240-epoch 的 MixStyle 与 DSU。额外六档比例权重可用 `--reuse-cp` 复用已有 CP；[完整命令](docs/EXPERIMENTS.md#source-validation-weight-study)见实验说明。`--init-checkpoint` 只加载模型参数，开启新阶段；`--resume` 才恢复中断任务的优化器状态。
 
-预测与计分分别由 [<code>scripts/evaluate.py</code>](scripts/evaluate.py) 和 [<code>scripts/score_predictions.py</code>](scripts/score_predictions.py) 完成：使用相同的 0.5 阈值、单尺度、无翻转集成、无目标域适应。[四域完整评估命令](docs/EXPERIMENTS.md#frozen-four-domain-evaluation)依次生成冻结预测与离线指标；[<code>scripts/aggregate_paper_domains.py</code>](scripts/aggregate_paper_domains.py)先在每个 seed 内对四域等权平均，再计算跨 seed 均值与**样本**标准差，并核查 vCDR 有效样本数。比例代理与直径分析见 [<code>scripts/analyze_ratio_geometry.py</code>](scripts/analyze_ratio_geometry.py)。
+预测与计分分别由 [<code>scripts/evaluate.py</code>](scripts/evaluate.py) 和 [<code>scripts/score_predictions.py</code>](scripts/score_predictions.py) 完成：使用相同的 0.5 阈值、单尺度、无翻转集成、无目标域适应。[四域完整评估命令](docs/EXPERIMENTS.md#frozen-four-domain-evaluation)依次生成冻结预测与离线指标；[<code>scripts/aggregate_paper_domains.py</code>](scripts/aggregate_paper_domains.py)先在每个 seed 内对四域等权平均，再计算跨 seed 均值与**样本**标准差，并核查 vCDR 有效样本数。比例代理与直径分析见[完整调用示例](docs/EXPERIMENTS.md#ratio-proxy-and-diameter-analysis)。
 
 ## <img src="assets/icon-map.svg" alt="" width="22" height="22"> 代码地图
 
@@ -96,11 +99,13 @@ python -m scripts.plan_experiments --suite matched --seeds 0 1 2
 
 仓库只发布**源码、配置、测试与说明**，不含眼底数据、预训练或训练权重、各 seed 的 checkpoint、预测、指标文件、凭据与服务器启动脚本。发布检查验证代码语法、配置一致性与文件哈希；代码公开本身不等于重新跑出论文数值。
 
+[源码自动检查](.github/workflows/source-checks.yml)会在推送和拉取请求时运行，核查发布文件与论文训练、评估计划，无需下载数据集或模型权重。
+
 ~~~bash
-python -m scripts.check_release
-python -m unittest discover -s tests -p test_release_plan.py
-python -m pytest -q
-CUDA_VISIBLE_DEVICES='' OMP_NUM_THREADS=2 python -m scripts.smoke_test
+python3 -m scripts.check_release
+python3 -m unittest discover -s tests -p test_release_plan.py
+python3 -m pytest -q
+CUDA_VISIBLE_DEVICES='' OMP_NUM_THREADS=2 python3 -m scripts.smoke_test
 ~~~
 
 smoke test 使用合成图像和小型骨干。源码采用 [MIT 许可证](LICENSE)；数据集、预训练模型和第三方依赖分别遵守各自条款。引用信息见 [<code>CITATION.cff</code>](CITATION.cff)。

@@ -359,6 +359,7 @@
     }
   ],
   "new_or_adapted_packaging_files": [
+    ".github/workflows/source-checks.yml",
     ".gitignore",
     "CITATION.cff",
     "LICENSE",
@@ -380,12 +381,13 @@
     "docs/PROVENANCE.md",
     "docs/VALIDATION.md",
     "pyproject.toml",
-    "scripts/check_release.py",
     "scripts/aggregate_paper_domains.py",
-    "scripts/plan_paper_evaluation.py",
+    "scripts/check_release.py",
     "scripts/plan_experiments.py",
+    "scripts/plan_paper_evaluation.py",
     "tests/test_paper_aggregation.py",
     "tests/test_paper_evaluation_plan.py",
+    "tests/test_release_hygiene.py",
     "tests/test_release_plan.py"
   ],
   "not_reproduced": [

@@ -13,7 +13,8 @@ The current manuscript states that Tables 1 and 2 use 240-epoch runs. This relea
 - Dry-run command generation passed: matched seeds 0/1/2 produce 18 training commands (3 initializers and 15 stage-2 jobs); the default 240-epoch baseline set produces 6. A six-weight ratio sweep with CP reuse produces 18 further stage-2 commands. The four-target full-model evaluation plan produces 12 prediction/scoring pairs. No training or real-data evaluation commands were executed by these checks.
 - Focused CPU checks passed for CP, full, w/o ratio, w/o VRA, and w/o SG using a tiny backbone: architecture-compatible initialization from CP, expected newly initialized VRA tensors, finite forward outputs, and nested probabilities.
 - Direct tensor checks passed for identical SG-on/off forward values, the intended direct disc-to-cup gradient switch, zero-initialized/bounded VRA correction, and finite soft-vCDR loss gradients.
-- Copied-file source hashes and package checksums are verified by `python -m scripts.check_release`. The common scorer and probability-analysis files are identical to the selected archived sources.
+- Copied-file source hashes and package checksums are verified by `python3 -m scripts.check_release`. The common scorer and probability-analysis files are identical to the selected archived sources.
+- The source-only GitHub Actions workflow checks the release inventory, 17 dependency-light protocol and release-hygiene tests, and both dry-run planners on Python 3.10 and 3.12. It does not run GPU training or claim to reproduce numerical results.
 - The clean directory contains no real-data manifests, retinal images/masks, model weights, logs, remote server paths, or remote launchers. The SVGs under `assets/` are original vector diagrams and icons, not dataset samples. A basic source-pattern scan found no obvious embedded access tokens/private keys; this is not a comprehensive credential or license audit.
 
 ## Runtime boundary

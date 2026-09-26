@@ -4,7 +4,7 @@ Obtain the original datasets separately. This repository supplies converters and
 
 ## Pretrained backbone
 
-Obtain the DINOv3-L/16 `model.safetensors` separately under its original terms and place it at `weights/dinov3/model.safetensors`. The paper initialization used SHA-256 `45172f209c9583c40538afc26b60a07033e6fcc2e8c30228338e6b2e932e7941`; check the file before training:
+Obtain the DINOv3-L/16 `model.safetensors` through the [official DINOv3 pretrained-model release](https://github.com/facebookresearch/dinov3#pretrained-models) under its original terms and place it at `weights/dinov3/model.safetensors`. The paper initialization used SHA-256 `45172f209c9583c40538afc26b60a07033e6fcc2e8c30228338e6b2e932e7941`; check the file before training:
 
 ```bash
 sha256sum weights/dinov3/model.safetensors
@@ -14,13 +14,13 @@ The config path is relative to the repository root. A newer same-named weight fi
 
 ## Five-centre archive: REFUGE, BinRushed, Magrabia
 
-The archived converter expects `Processed_Fundus_Images.zip`, Zenodo record **8009107**, with archive MD5 `a28baa241c45c95d14f9279e4c664d9a`. Extract it so that the official `<Domain>_train.csv` and `<Domain>_test.csv` files and their referenced images/masks are directly below `data/fundus_dg/extracted/`.
+The archived converter expects `Processed_Fundus_Images.zip` from [Zenodo record 8009107](https://zenodo.org/records/8009107), with archive MD5 `a28baa241c45c95d14f9279e4c664d9a`. Extract it so that the official `<Domain>_train.csv` and `<Domain>_test.csv` files and their referenced images/masks are directly below `data/fundus_dg/extracted/`.
 
 ```bash
-python -m scripts.prepare_fundus_dg_5centre \
+python3 -m scripts.prepare_fundus_dg_5centre \
   --dataset-root data/fundus_dg --manifest-dir manifests/fundus_dg
 
-python -m scripts.build_fundus_dg_protocol \
+python3 -m scripts.build_fundus_dg_protocol \
   --manifest-dir manifests/fundus_dg --sources REFUGE --target BinRushed \
   --output-dir manifests/refuge_protocol
 
@@ -37,7 +37,7 @@ The raw mask encoding is 255=background, 128=disc rim, 0=cup. The converter writ
 Place the separately obtained official images, reference masks, and license file under an extraction root, then:
 
 ```bash
-python -m scripts.prepare_rim_one --archive-root data/raw/rim_one \
+python3 -m scripts.prepare_rim_one --archive-root data/raw/rim_one \
   --output-root data/rim_one --manifest-dir manifests
 ```
 
@@ -48,7 +48,7 @@ Use `manifests/rim_one_eval.csv` with `--data-root data/rim_one`: this is the of
 Place the official extracted PAPILA archive below an extraction root, then:
 
 ```bash
-python -m scripts.prepare_papila --archive-root data/raw/papila \
+python3 -m scripts.prepare_papila --archive-root data/raw/papila \
   --output-root data/papila --manifest-dir manifests \
   --expert 1 --suspect-policy exclude --val-fraction 0.2 --seed 42
 ```
@@ -69,7 +69,7 @@ images/example.png,masks/example_od.png,masks/example_oc.png,,example-patient,RE
 For canonical three-class masks, replace `od_mask,oc_mask` with `mask` and set `mask_encoding=three_class`. Keep the `glaucoma` column empty for datasets without diagnosis labels; the segmentation configs set classification loss weight to zero. Relative image/mask paths resolve against `--data-root`, not against the CSV location. IDs must be unique. Separate source patients between training and validation when patient identity is available; the five-centre archive's image-ID proxy is not evidence of patient-level disjointness.
 
 ```bash
-python -m scripts.validate_manifest --csv manifests/source_train.csv \
+python3 -m scripts.validate_manifest --csv manifests/source_train.csv \
   --mode source --check-paths --root data/fundus_dg
 ```
 

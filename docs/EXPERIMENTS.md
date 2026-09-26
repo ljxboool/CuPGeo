@@ -9,11 +9,11 @@ This is the executable map for the current manuscript. Run commands from the rep
 | Full CuPGeo | `configs/cupgeo.yaml` | Same-seed CP best, another 120 epochs |
 | w/o ratio | `configs/cupgeo_no_ratio.yaml` | Same-seed CP best, another 120 epochs |
 | w/o VRA / CP + ratio | `configs/cupgeo_no_vra.yaml` | Same-seed CP best, another 120 epochs |
-| Full w/o SG | `configs/cupgeo_no_sg.yaml` | Same-seed CP best, SG disabled only in stage 2 |
+| Table 3: Full w/o SG | `configs/cupgeo_no_sg.yaml` | Same-seed CP best, SG disabled only in stage 2 |
 | Table 1: CuPGeo | `cupgeo.yaml` | Reuse matched `stage2_full/best.pt` after CP 120 + Full 120 |
 | Table 1: MixStyle / DSU | `mixstyle.yaml`, `dsu.yaml` | Separate 240-epoch runs from the pretrained backbone |
-| Source weight table | `cupgeo_ratio_025/050/100/150/250/300.yaml`, `cupgeo.yaml` for 2.00 | Seven settings, from the same-seed CP checkpoint; source validation only |
-| Ratio-proxy table | `scripts/analyze_ratio_geometry.py` | Reuse frozen Full and w/o ratio predictions; no further training |
+| Table 4: source weight selection | `cupgeo_ratio_025/050/100/150/250/300.yaml`, `cupgeo.yaml` for 2.00 | Seven settings, from the same-seed CP checkpoint; source validation only |
+| Table 5: ratio-proxy validation | `scripts/analyze_ratio_geometry.py` | Reuse frozen Full and w/o ratio predictions; no further training |
 
 CuPGeo component configs specify one 120-epoch stage; the MixStyle and DSU configs specify 240 epochs. The launch command determines whether a CuPGeo config is CP pretraining or a second stage initialized from CP. The same YAML alone does not prove the provenance of a reported result.
 
@@ -38,14 +38,14 @@ Before running, create the [paper manifests and data roots](DATA.md), place the 
 ## Direct matched commands (seed 0)
 
 ```bash
-python -m scripts.train_source --config configs/cp_baseline.yaml \
+python3 -m scripts.train_source --config configs/cp_baseline.yaml \
   --seed 0 --output runs/matched/seed0/stage1_cp
 
-python -m scripts.train_source --config configs/cupgeo.yaml \
+python3 -m scripts.train_source --config configs/cupgeo.yaml \
   --seed 0 --init-checkpoint runs/matched/seed0/stage1_cp/best.pt \
   --output runs/matched/seed0/stage2_full
 
-python -m scripts.train_source --config configs/cupgeo_no_sg.yaml \
+python3 -m scripts.train_source --config configs/cupgeo_no_sg.yaml \
   --seed 0 --init-checkpoint runs/matched/seed0/stage1_cp/best.pt \
   --output runs/matched/seed0/stage2_no_sg
 ```
@@ -55,11 +55,11 @@ Use the same initialization for `cp_baseline.yaml`, `cupgeo_no_ratio.yaml`, and 
 For the complete three-seed launch, inspect the dry-run plans and add `--execute` only when data and backbone weights are ready. Before execution, the planner checks the REFUGE 320/80 source split, disjoint image IDs, and the original DINOv3 SHA-256. It refuses to overwrite an existing run directory.
 
 ```bash
-python -m scripts.plan_experiments --suite single --seeds 0 1 2
-python -m scripts.plan_experiments --suite matched --seeds 0 1 2
+python3 -m scripts.plan_experiments --suite single --seeds 0 1 2
+python3 -m scripts.plan_experiments --suite matched --seeds 0 1 2
 
-CUDA_VISIBLE_DEVICES=0 python -m scripts.plan_experiments --suite single --seeds 0 1 2 --execute
-CUDA_VISIBLE_DEVICES=0 python -m scripts.plan_experiments --suite matched --seeds 0 1 2 --execute
+CUDA_VISIBLE_DEVICES=0 python3 -m scripts.plan_experiments --suite single --seeds 0 1 2 --execute
+CUDA_VISIBLE_DEVICES=0 python3 -m scripts.plan_experiments --suite matched --seeds 0 1 2 --execute
 ```
 
 The `single` suite supplies the in-repository 240-epoch MixStyle and DSU runs. CuPGeo in Table 1 comes from the `matched` suite's Full checkpoint, also used in Table 2. Other Table 1 methods follow their own architectures and are not silently mapped to these configs. The `matched` suite performs one CP stage 1 per seed and five independent stage-2 runs per seed.
@@ -69,10 +69,10 @@ The `single` suite supplies the in-repository 240-epoch MixStyle and DSU runs. C
 After `matched` stage 1 exists, reuse its three CP checkpoints for the six additional ratio weights; the already completed `stage2_full` supplies weight 2.00. Every weight is selected and compared on the same 80-image REFUGE source validation set, not on target domains.
 
 ```bash
-python -m scripts.plan_experiments --suite matched --seeds 0 1 2 --reuse-cp \
+python3 -m scripts.plan_experiments --suite matched --seeds 0 1 2 --reuse-cp \
   --variants ratio_025 ratio_050 ratio_100 ratio_150 ratio_250 ratio_300
 
-CUDA_VISIBLE_DEVICES=0 python -m scripts.plan_experiments --suite matched --seeds 0 1 2 \
+CUDA_VISIBLE_DEVICES=0 python3 -m scripts.plan_experiments --suite matched --seeds 0 1 2 \
   --reuse-cp --variants ratio_025 ratio_050 ratio_100 ratio_150 ratio_250 ratio_300 --execute
 ```
 
@@ -90,20 +90,32 @@ The planner checks that each existing same-seed `stage1_cp/best.pt` is present b
 The evaluation planner covers **every** selected seed and all four target manifests. It checks their expected paper counts before execution, runs `scripts.evaluate --predictions` without loading labels, then calls the common `scripts.score_predictions` offline scorer. Outputs stay below ignored `runs/`. It refuses to overwrite existing predictions or summaries.
 
 ```bash
-python -m scripts.plan_paper_evaluation --suite matched --seeds 0 1 2
-python -m scripts.plan_paper_evaluation --suite single --seeds 0 1 2
+python3 -m scripts.plan_paper_evaluation --suite matched --seeds 0 1 2
+python3 -m scripts.plan_paper_evaluation --suite single --seeds 0 1 2
 
-CUDA_VISIBLE_DEVICES=0 python -m scripts.plan_paper_evaluation --suite matched --seeds 0 1 2 --execute
-CUDA_VISIBLE_DEVICES=0 python -m scripts.plan_paper_evaluation --suite single --seeds 0 1 2 --execute
+CUDA_VISIBLE_DEVICES=0 python3 -m scripts.plan_paper_evaluation --suite matched --seeds 0 1 2 --execute
+CUDA_VISIBLE_DEVICES=0 python3 -m scripts.plan_paper_evaluation --suite single --seeds 0 1 2 --execute
 
-python -m scripts.aggregate_paper_domains --suite matched --variant full --method full \
+python3 -m scripts.aggregate_paper_domains --suite matched --variant full --method full \
   --seeds 0 1 2 --output runs/paper/matched/full_macro4.json
-python -m scripts.aggregate_paper_domains --suite single --variant mixstyle --method mixstyle \
+python3 -m scripts.aggregate_paper_domains --suite single --variant mixstyle --method mixstyle \
   --seeds 0 1 2 --output runs/paper/single/mixstyle_macro4.json
 ```
 
-The same aggregation command accepts any completed variant, for example `--variant no_vra --method no_vra` in the matched suite. Score summaries and per-image records are private evaluation artifacts. For ratio-proxy and diameter analyses, reuse the saved probability artifacts with `scripts.analyze_ratio_geometry` and `configs/geometry_jobs.example.json`.
+The same aggregation command accepts any completed variant, for example `--variant no_vra --method no_vra` in the matched suite. Score summaries and per-image records are private evaluation artifacts. For ratio-proxy and diameter analyses, analyze the saved prediction artifacts with `scripts.analyze_ratio_geometry` and `configs/geometry_jobs.example.json`.
 Figure 3 uses fixed seed-0 cases from the matched full/ablation predictions, with the shared 0.5 threshold; the repository does not publish patient images or rendered masks.
+
+## Ratio-proxy and diameter analysis
+
+After generating frozen predictions, copy `configs/geometry_jobs.example.json` to a job file under the ignored `runs/` directory and extend it with every required seed, domain, and method. The supplied example contains only one seed of Full and is not a complete Table 5 analysis. Run from the repository root:
+
+```bash
+python3 -m scripts.analyze_ratio_geometry \
+  --spec runs/paper/geometry_jobs.json --output runs/paper/geometry_analysis \
+  --source-root . --threads 2 --compute-proxy
+```
+
+The script writes probability arrays and per-image records, so keep its output below ignored `runs/`. For Table 5, include matched Full and w/o ratio predictions for all three seeds and four targets; `--compute-proxy` calculates moment targets for those jobs. Check the complete job matrix and source checkpoint identities before quoting aggregate results.
 
 ## Metrics and aggregation
 
