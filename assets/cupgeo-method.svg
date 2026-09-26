@@ -1,64 +1,110 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="348" viewBox="0 0 1200 348" role="img" aria-labelledby="title desc">
-  <title id="title">CuPGeo method overview</title>
-  <desc id="desc">A restrained vector schematic of DINOv3 and Pyramid-FPN features, vertical region allocation, cup-preserving composition, and soft vertical cup-to-disc ratio supervision.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="738" viewBox="0 0 1200 738" role="img" aria-labelledby="title desc">
+  <title id="title">CuPGeo — cup-preserving nested geometry</title>
+  <desc id="desc">Conceptual vector illustration. DINOv3 and Pyramid-FPN produce shared features. Five vertical regions provide bounded cup-logit refinement, followed by cup-preserving composition of nested disc and cup probabilities. Source training supervises the ratio of their second-moment vertical extents. Frozen inference is used on unseen domains. Shapes are schematic, not patient images or model predictions.</desc>
   <defs>
-    <marker id="arrow" viewBox="0 0 8 8" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
-      <path d="M1 1L7 4L1 7" fill="none" stroke="#77919D" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-    </marker>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FBFCFA"/><stop offset="1" stop-color="#F1F3EE"/></linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0.75" y2="1"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#F8FAF7"/></linearGradient>
+    <linearGradient id="plane" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#F6FBF7"/><stop offset="0.52" stop-color="#B8D8CE"/><stop offset="1" stop-color="#7AACAC"/></linearGradient>
+    <radialGradient id="disc" cx="35%" cy="28%" r="80%"><stop stop-color="#F1FAEE"/><stop offset="0.5" stop-color="#C4DFD1"/><stop offset="1" stop-color="#6FA8A0"/></radialGradient>
+    <radialGradient id="cup" cx="34%" cy="24%" r="85%"><stop stop-color="#FFF6E6"/><stop offset="0.5" stop-color="#EAC6A7"/><stop offset="1" stop-color="#BF8967"/></radialGradient>
+    <linearGradient id="ink" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#204C50"/><stop offset="1" stop-color="#15373D"/></linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#BED7CC"/><stop offset="1" stop-color="#DAE9DF"/></linearGradient>
+    <filter id="shadow" x="-15%" y="-15%" width="130%" height="145%"><feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#173D43" flood-opacity="0.065"/></filter>
+    <filter id="lift" x="-25%" y="-25%" width="150%" height="160%"><feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#173D43" flood-opacity="0.12"/></filter>
+    <pattern id="grid" width="22" height="22" patternUnits="userSpaceOnUse"><path d="M22 0H0V22" fill="none" stroke="#719B95" stroke-opacity="0.12" stroke-width="0.7"/></pattern>
+    <marker id="arrow" viewBox="0 0 8 8" markerWidth="7" markerHeight="7" refX="6" refY="4" orient="auto"><path d="M1 1L5.5 4L1 7" fill="none" stroke="#72938C" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <clipPath id="prior"><rect x="452" y="253" width="104" height="156" rx="9"/></clipPath>
+    <clipPath id="surface"><rect x="1" y="1" width="1198" height="736" rx="22"/></clipPath>
   </defs>
-  <rect x="1" y="1" width="1198" height="346" rx="5" fill="#FFFFFF" stroke="#D9E2E7" stroke-width="2"/>
-  <text x="32" y="42" fill="#203642" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700">CuPGeo</text>
-  <text x="1168" y="41" text-anchor="end" fill="#687E88" font-family="Arial, Helvetica, sans-serif" font-size="12" letter-spacing="1.3">SOURCE-ONLY  ·  NESTED OD / OC</text>
-  <line x1="32" y1="57" x2="1168" y2="57" stroke="#D9E2E7" stroke-width="1"/>
-
-  <g fill="#FAFBFC" stroke="#D7E0E5" stroke-width="1.2">
-    <rect x="30" y="78" width="251" height="220" rx="5"/>
-    <rect x="326" y="78" width="251" height="220" rx="5"/>
-    <rect x="622" y="78" width="251" height="220" rx="5"/>
-    <rect x="918" y="78" width="251" height="220" rx="5"/>
+  <g clip-path="url(#surface)">
+    <rect x="1" y="1" width="1198" height="736" rx="22" fill="url(#paper)"/>
+    <path d="M825 0H1200V136H1045Z" fill="url(#grid)" opacity="0.6"/>
+    <path d="M1050 -35C926 17 899 72 867 133M1085 -35C961 17 934 72 902 133" fill="none" stroke="#D6E3D8" stroke-width="1"/>
   </g>
-  <g fill="none" stroke="#77919D" stroke-width="1.5" marker-end="url(#arrow)">
-    <path d="M286 188H317"/>
-    <path d="M582 188H613"/>
-    <path d="M878 188H909"/>
-  </g>
-
+  <rect x="1" y="1" width="1198" height="736" rx="22" fill="none" stroke="#D9E2D9"/>
   <g font-family="Arial, Helvetica, sans-serif">
-    <text x="49" y="106" fill="#4D7885" font-size="12" font-weight="700" letter-spacing="1">01  SHARED FEATURES</text>
-    <text x="49" y="132" fill="#203642" font-size="18" font-weight="700">DINOv3-L/16 + FPN</text>
-    <circle cx="112" cy="202" r="46" fill="none" stroke="#7896A0" stroke-width="2"/>
-    <circle cx="112" cy="202" r="26" fill="none" stroke="#A6BCC3" stroke-width="1.6"/>
-    <circle cx="112" cy="202" r="9" fill="none" stroke="#C58C71" stroke-width="2"/>
-    <path d="M66 202H158M112 156V248" stroke="#C3D0D4" stroke-width="1" stroke-dasharray="3 4"/>
-    <path d="M178 166V238M194 177V238M210 159V238M226 184V238" stroke="#5F9CA6" stroke-width="5" stroke-linecap="round"/>
-    <text x="49" y="276" fill="#667F89" font-size="13">Fundus image → multi-scale features</text>
-
-    <text x="345" y="106" fill="#4D7885" font-size="12" font-weight="700" letter-spacing="1">02  VERTICAL ALLOCATION</text>
-    <text x="345" y="132" fill="#203642" font-size="18" font-weight="700">Cup localization prior</text>
-    <rect x="370" y="157" width="73" height="94" fill="#FFFFFF" stroke="#8EA7B0" stroke-width="1"/>
-    <rect x="376" y="163" width="61" height="15" fill="#E8EFF1"/>
-    <rect x="376" y="181" width="61" height="16" fill="#D2E3E6"/>
-    <rect x="376" y="200" width="61" height="19" fill="#E5BAA5"/>
-    <rect x="376" y="222" width="61" height="16" fill="#D2E3E6"/>
-    <rect x="376" y="241" width="61" height="4" fill="#E8EFF1"/>
-    <path d="M461 200H516M461 219H516M527 200V219M521 200H533M521 219H533" fill="none" stroke="#B37D62" stroke-width="1.5"/>
-    <text x="455" y="185" fill="#788E97" font-size="12">five regions</text>
-    <text x="345" y="276" fill="#667F89" font-size="13">Bounded correction to cup logits</text>
-
-    <text x="641" y="106" fill="#4D7885" font-size="12" font-weight="700" letter-spacing="1">03  CUP-PRESERVING</text>
-    <text x="641" y="132" fill="#203642" font-size="18" font-weight="700">Nested composition</text>
-    <ellipse cx="747" cy="199" rx="62" ry="47" fill="none" stroke="#4F929D" stroke-width="2.4"/>
-    <ellipse cx="747" cy="199" rx="26" ry="33" fill="none" stroke="#C58C71" stroke-width="2.4"/>
-    <path d="M747 155V243" stroke="#BCCBD0" stroke-width="1" stroke-dasharray="3 4"/>
-    <text x="641" y="276" fill="#667F89" font-size="13">P(OD) ≥ P(OC), pixelwise</text>
-
-    <text x="937" y="106" fill="#4D7885" font-size="12" font-weight="700" letter-spacing="1">04  RATIO SUPERVISION</text>
-    <text x="937" y="132" fill="#203642" font-size="18" font-weight="700">Soft vCDR</text>
-    <path d="M986 158V243M980 158H992M980 243H992" fill="none" stroke="#4F929D" stroke-width="2"/>
-    <path d="M1038 175V226M1032 175H1044M1032 226H1044" fill="none" stroke="#C58C71" stroke-width="2"/>
-    <text x="1058" y="208" fill="#35515D" font-size="16" font-weight="700">d<tspan baseline-shift="sub" font-size="11">cup</tspan> / d<tspan baseline-shift="sub" font-size="11">disc</tspan></text>
-    <text x="937" y="276" fill="#667F89" font-size="13">Differentiable vertical geometry</text>
-
-    <text x="600" y="326" text-anchor="middle" fill="#667F89" font-size="13">Source training with OD/OC masks and paired views  ·  Frozen prediction on unseen domains</text>
+    <text x="40" y="39" fill="#54766E" font-size="12" font-weight="700" letter-spacing="2.3">CuPGeo / METHOD OVERVIEW</text>
+    <text x="39" y="83" fill="#173D43" font-size="34" font-weight="700" letter-spacing="-0.8">Cup-preserving nested geometry</text>
+    <text x="40" y="112" fill="#60766F" font-size="17">Local cup localization. Structural containment. Global proportion.</text>
+    <rect x="1014" y="37" width="148" height="31" rx="15.5" fill="#E7EFE7" stroke="#C9DAD0"/>
+    <circle cx="1031" cy="52.5" r="3" fill="#337F80"/>
+    <text x="1043" y="57" fill="#315B55" font-size="11" font-weight="700" letter-spacing="1.2">SOURCE ONLY</text>
+    <!-- Three forward stages; source supervision is separated below. -->
+    <g fill="url(#card)" stroke="#DCE5DC" filter="url(#shadow)">
+      <rect x="28" y="148" width="360" height="342" rx="16"/>
+      <rect x="420" y="148" width="360" height="342" rx="16"/>
+      <rect x="812" y="148" width="360" height="342" rx="16"/>
+    </g>
+    <g fill="none" stroke="#72938C" stroke-width="1.5" marker-end="url(#arrow)"><path d="M393 321H413"/><path d="M785 321H805"/></g>
+    <g fill="#69847B" font-size="11" font-weight="700" letter-spacing="1.5">
+      <text x="51" y="179">01 / SHARED REPRESENTATION</text><text x="443" y="179">02 / VERTICAL ALLOCATION</text><text x="835" y="179">03 / CUP-PRESERVING OUTPUT</text>
+    </g>
+    <g fill="#173D43" font-size="22" font-weight="700" letter-spacing="-0.4">
+      <text x="51" y="212">DINOv3 + LoRA</text><text x="443" y="212">A prior for the cup</text><text x="835" y="212">Nested by construction</text>
+    </g>
+    <!-- Abstract multiscale feature planes, not measured activations. -->
+    <ellipse cx="207" cy="388" rx="111" ry="13" fill="#D9E6DD" opacity="0.58"/>
+    <g stroke-linejoin="round" filter="url(#lift)">
+      <path d="M88 338L199 301L319 350L203 393Z" fill="#D7E6DB" stroke="#93B6AA"/>
+      <path d="M88 338V347L203 402V393Z" fill="#B2CCC0" stroke="#93B6AA"/><path d="M203 393L319 350V359L203 402Z" fill="#99BCB0" stroke="#93B6AA"/>
+      <path d="M88 311L199 274L319 323L203 366Z" fill="#C7DED1" stroke="#85AEA2"/>
+      <path d="M88 311V319L203 374V366Z" fill="#A8CABC" stroke="#85AEA2"/><path d="M203 366L319 323V331L203 374Z" fill="#8AB2A6" stroke="#85AEA2"/>
+      <path d="M88 284L199 247L319 296L203 339Z" fill="url(#plane)" stroke="#6B9E93" stroke-width="1.2"/>
+      <path d="M88 284V292L203 347V339Z" fill="#B4D1C1" stroke="#6B9E93"/><path d="M203 339L319 296V304L203 347Z" fill="#7FA99F" stroke="#6B9E93"/>
+      <g fill="none" stroke="#FFFFFF" stroke-opacity="0.58" stroke-width="0.8"><path d="M116 275L232 328M143 266L261 318M171 257L290 307M116 298L228 259M145 312L258 272M174 325L288 284"/></g>
+      <path d="M170 281L197 272L226 284L199 294Z" fill="#EAC4A3" stroke="#C89B7B"/><path d="M199 294L226 284L255 297L228 307Z" fill="#DFB08B" stroke="#C89B7B"/>
+    </g>
+    <path d="M77 251V399M72 251H82M72 399H82" fill="none" stroke="#A5BCB0" stroke-width="1"/>
+    <text x="207" y="435" text-anchor="middle" fill="#3D6A61" font-size="14">Pyramid-FPN · multi-scale features</text>
+    <!-- Five ordered vertical intervals, not a five-class segmentation map. -->
+    <g clip-path="url(#prior)">
+      <rect x="452" y="253" width="104" height="26" fill="#EEF1E9"/><rect x="452" y="279" width="104" height="31" fill="url(#rim)"/>
+      <rect x="452" y="310" width="104" height="48" fill="url(#cup)"/><rect x="452" y="358" width="104" height="29" fill="url(#rim)"/>
+      <rect x="452" y="387" width="104" height="22" fill="#EEF1E9"/><path d="M452 279H556M452 310H556M452 358H556M452 387H556" stroke="#FFFFFF" stroke-width="2"/>
+    </g>
+    <rect x="452" y="253" width="104" height="156" rx="9" fill="none" stroke="#C0D2C5"/>
+    <g fill="#365F53" font-size="11" text-anchor="middle">
+      <text x="504" y="270">outside</text><text x="504" y="299">upper rim</text><text x="504" y="338" fill="#76533A" font-size="13" font-weight="700">cup</text><text x="504" y="377">lower rim</text><text x="504" y="402">outside</text>
+    </g>
+    <path d="M568 331H594" fill="none" stroke="#72938C" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <rect x="611" y="253" width="132" height="156" rx="10" fill="#EFF4EE" stroke="#D9E3D7"/><rect x="611" y="253" width="132" height="156" rx="10" fill="url(#grid)" opacity="0.65"/>
+    <path d="M653 281C679 263 711 287 713 323C718 363 692 393 667 380C642 368 635 309 653 281Z" fill="#E7D3B8" opacity="0.5"/>
+    <path d="M661 289C681 276 703 294 705 325C708 355 690 381 672 372C651 363 645 309 661 289Z" fill="url(#cup)" stroke="#BD8866" stroke-width="1.5" filter="url(#lift)"/>
+    <path d="M667 295C679 287 693 298 697 317" fill="none" stroke="#FFF6E9" stroke-width="2" stroke-linecap="round"/>
+    <path d="M603 310H751M603 358H751" stroke="#AE8C67" stroke-width="1" stroke-dasharray="3 5" opacity="0.55"/>
+    <text x="504" y="435" text-anchor="middle" fill="#3D6A61" font-size="14">5 vertical regions</text><text x="677" y="435" text-anchor="middle" fill="#3D6A61" font-size="14">Refined cup logits</text>
+    <!-- Containment follows from the output construction. -->
+    <ellipse cx="986" cy="400" rx="90" ry="10" fill="#D7E4D8" opacity="0.65"/>
+    <path d="M982 247C1034 244 1070 280 1077 325C1084 368 1052 405 1004 410C954 419 904 388 902 341C896 294 933 251 982 247Z" fill="url(#disc)" stroke="#538D82" stroke-width="1.7" filter="url(#lift)"/>
+    <path d="M984 257C1020 254 1051 278 1060 309" fill="none" stroke="#F4FBF1" stroke-width="2" stroke-linecap="round" opacity="0.85"/>
+    <path d="M981 279C1006 272 1027 297 1028 328C1031 360 1013 385 991 381C968 378 951 353 952 326C951 302 961 284 981 279Z" fill="url(#cup)" stroke="#BA835F" stroke-width="1.6" filter="url(#lift)"/>
+    <path d="M981 288C996 282 1011 297 1017 313" fill="none" stroke="#FFF5E3" stroke-width="2" stroke-linecap="round"/>
+    <path d="M990 234V421" stroke="#4A7568" stroke-width="0.9" stroke-dasharray="3 5" opacity="0.3"/>
+    <path d="M1074 287H1100" fill="none" stroke="#538D82" stroke-width="1.2"/><text x="1105" y="291" fill="#336B60" font-size="12" font-weight="700">OD</text>
+    <text x="990" y="335" text-anchor="middle" fill="#775338" font-size="13" font-weight="700">OC</text>
+    <text x="992" y="435" text-anchor="middle" fill="#3D6A61" font-size="14">Cup + residual rim → optic disc</text>
+    <g stroke="#E3E9DF" stroke-width="1"><path d="M51 452H365"/><path d="M443 452H757"/><path d="M835 452H1149"/></g>
+    <g fill="#697F73" font-size="12.5"><text x="51" y="474">Shared anatomy and paired-view objectives</text><text x="443" y="474">Bounded correction before composition</text><text x="835" y="474">Same threshold · nested OD / OC masks</text></g>
+    <!-- The source-training ratio objective uses final probability-map moments. -->
+    <rect x="28" y="516" width="1144" height="164" rx="16" fill="url(#ink)"/>
+    <rect x="29" y="517" width="1142" height="162" rx="15" fill="none" stroke="#FFFFFF" stroke-opacity="0.08"/>
+    <g transform="translate(51 540)">
+      <path d="M10 6V115H134" fill="none" stroke="#A1BFB4" stroke-opacity="0.45" stroke-width="1"/>
+      <path d="M17 12C25 15 25 36 75 48C119 60 119 75 75 86C26 98 25 110 17 112" fill="none" stroke="#99CBB8" stroke-width="2"/>
+      <path d="M17 39C25 42 30 52 56 58C81 64 81 72 56 78C31 84 25 91 17 93" fill="none" stroke="#E6BA8D" stroke-width="2"/>
+      <path d="M145 12V112M141 12H149M141 112H149" fill="none" stroke="#99CBB8" stroke-width="1.2"/><path d="M166 39V93M162 39H170M162 93H170" fill="none" stroke="#E6BA8D" stroke-width="1.2"/>
+      <text x="193" y="39" fill="#99CBB8" font-size="12">OD</text><text x="193" y="61" fill="#E6BA8D" font-size="12">OC</text>
+    </g>
+    <text x="294" y="546" fill="#ADD0BE" font-size="10.5" font-weight="700" letter-spacing="1.5">SOURCE TRAINING / SOFT-vCDR</text>
+    <text x="294" y="578" fill="#F7F8EF" font-size="22" font-weight="700">Second-moment vertical extent</text>
+    <text x="294" y="613" fill="#F4E7D2" font-family="Georgia, 'Times New Roman', serif" font-size="25">r̃ = d̃<tspan baseline-shift="sub" font-size="15">C</tspan><tspan baseline-shift="baseline"> / (d̃</tspan><tspan baseline-shift="sub" font-size="15">D</tspan><tspan baseline-shift="baseline"> + ε)</tspan></text>
+    <text x="294" y="649" fill="#B8CEC0" font-size="14">d̃(P) = 4√Var<tspan baseline-shift="sub" font-size="10">P</tspan><tspan baseline-shift="baseline">(y) · supervision from source masks</tspan></text>
+    <path d="M753 540V656" stroke="#A4C0B1" stroke-opacity="0.23"/>
+    <text x="783" y="546" fill="#ADD0BE" font-size="10.5" font-weight="700" letter-spacing="1.5">FORWARD GEOMETRY / CP</text>
+    <text x="783" y="591" fill="#F7F8EF" font-family="Georgia, 'Times New Roman', serif" font-size="25">P<tspan baseline-shift="sub" font-size="15">D</tspan><tspan baseline-shift="baseline"> = P</tspan><tspan baseline-shift="sub" font-size="15">C</tspan><tspan baseline-shift="baseline"> + (1 − P</tspan><tspan baseline-shift="sub" font-size="15">C</tspan><tspan baseline-shift="baseline">) P</tspan><tspan baseline-shift="sub" font-size="15">R</tspan></text>
+    <circle cx="790" cy="631" r="3" fill="#A6D3B7"/>
+    <text x="803" y="636" fill="#D6E5D7" font-size="15">P<tspan baseline-shift="sub" font-size="10">D</tspan><tspan baseline-shift="baseline"> ≥ P</tspan><tspan baseline-shift="sub" font-size="10">C</tspan><tspan baseline-shift="baseline">, pixelwise · SG on the disc branch</tspan></text>
+    <text x="40" y="713" fill="#4B6E61" font-size="14">Frozen inference on unseen domains</text>
+    <text x="1160" y="713" text-anchor="end" fill="#7C8D80" font-size="12">Conceptual geometry · not patient data</text>
   </g>
 </svg>

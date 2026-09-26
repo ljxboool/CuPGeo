@@ -1,4 +1,4 @@
-<p align="center"><img src="assets/cupgeo-mark.svg" alt="CuPGeo mark" width="56" height="56"></p>
+<p align="center"><img src="assets/cupgeo-mark.svg" alt="CuPGeo mark" width="72" height="72"></p>
 <h1 align="center">CuPGeo</h1>
 <p align="center">
   <strong>Beyond Containment</strong><br>
@@ -25,7 +25,7 @@
 CuPGeo treats the optic cup as a geometric anchor. A vertical region allocation (VRA) head provides a bounded cup-localization prior; cup-preserving (CP) composition completes the optic disc with residual rim probability; and a differentiable soft-vCDR objective supervises their relative vertical extent. The model trains on labeled **source** images and performs frozen inference on unseen target domains.
 
 <p align="center">
-  <img src="assets/cupgeo-method.svg" alt="CuPGeo method: shared features, vertical allocation, cup-preserving composition, and soft-vCDR supervision" width="100%">
+  <a href="assets/cupgeo-method.svg"><img src="assets/cupgeo-method.svg" alt="CuPGeo method: layered shared features, five-region cup refinement, nested OD/OC outputs, and source-mask moment-ratio supervision" width="100%"></a>
 </p>
 
 | Geometry | What it contributes |

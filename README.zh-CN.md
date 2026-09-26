@@ -1,4 +1,4 @@
-<p align="center"><img src="assets/cupgeo-mark.svg" alt="CuPGeo 标识" width="56" height="56"></p>
+<p align="center"><img src="assets/cupgeo-mark.svg" alt="CuPGeo 标识" width="72" height="72"></p>
 <h1 align="center">CuPGeo</h1>
 <p align="center"><strong>Beyond Containment · 超越杯盘包含</strong></p>
 <p align="center">面向跨域视盘与视杯分割的杯保持嵌套几何框架</p>
@@ -22,7 +22,7 @@
 CuPGeo 以视杯为几何锚点：**VRA** 给杯位置提供有界的竖直先验，**CP** 用杯概率与残余盘缘概率构造嵌套输出，**soft-vCDR** 在源域训练时约束杯盘的相对竖直尺度。目标域只做冻结推理，不进行测试时适应。
 
 <p align="center">
-  <img src="assets/cupgeo-method.svg" alt="CuPGeo 方法示意：共享特征、竖直分配、杯保持构造和 soft-vCDR 监督" width="100%">
+  <a href="assets/cupgeo-method.svg"><img src="assets/cupgeo-method.svg" alt="CuPGeo 方法示意：多尺度特征、五区域视杯校正、嵌套杯盘输出与源域二阶矩比例监督" width="100%"></a>
 </p>
 
 | 模块 | 作用 |
