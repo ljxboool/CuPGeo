@@ -30,7 +30,32 @@ jobs:
           python -m unittest discover -s tests -p test_paper_evaluation_plan.py
           python -m unittest discover -s tests -p test_paper_aggregation.py
           python -m unittest discover -s tests -p test_release_hygiene.py
+          python -m unittest discover -s tests -p test_geometry_workflow.py
       - name: Check dry-run commands
         run: |
           python -m scripts.plan_experiments --suite matched --seeds 0 1 2 > /dev/null
           python -m scripts.plan_paper_evaluation --suite matched --variants full --seeds 0 1 2 > /dev/null
+          python -m scripts.analyze_ratio_geometry --spec configs/geometry_jobs.example.json --output runs/geometry_preview --source-root . --dry-run
+
+  cpu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CUDA_VISIBLE_DEVICES: ''
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install CPU runtime
+        run: |
+          python -m pip install torch==2.7.1 torchvision==0.22.1 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e '.[dev,analysis]'
+      - name: Test model and analysis workflows
+        run: python -m pytest -q
+      - name: Run synthetic training and evaluation
+        run: python -m scripts.smoke_test --output runs/ci_smoke

@@ -122,7 +122,7 @@ The historical <code>c3tta</code> Python namespace is retained for checkpoint co
 
 This repository contains **code, configurations, tests, and documentation**. It does **not** contain retinal datasets, pretrained or trained weights, per-seed checkpoints, predictions, score files, credentials, or server launch scripts. The release checker verifies syntax, configuration consistency, source hashes, and the source-only file inventory; it is not a claim that publishing the package reproduced the paper's numerical results.
 
-The lightweight [source checks](.github/workflows/source-checks.yml) run automatically on pushes and pull requests. They check the release inventory and the paper's training/evaluation plans without downloading datasets or model weights.
+The [automated checks](.github/workflows/source-checks.yml) run on pushes and pull requests: release and protocol checks on Python 3.10/3.12, plus the full test suite and a synthetic CPU training-to-evaluation workflow on Python 3.11. Geometry tests verify that exporting and reusing probabilities give identical metrics. No datasets or pretrained weights are downloaded.
 
 ~~~bash
 python3 -m scripts.check_release

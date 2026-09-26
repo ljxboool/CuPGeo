@@ -12,6 +12,7 @@ import json
 import math
 import os
 from pathlib import Path
+import re
 import sys
 import time
 
@@ -53,11 +54,99 @@ def write_csv(path, records):
     temp.replace(path)
 
 
+def require(condition, message):
+    if not condition:
+        raise ValueError(str(message))
+
+
+def private_output(path, private_root):
+    output, root = Path(path).resolve(), Path(private_root).resolve()
+    require(output != root and output.is_relative_to(root),
+            f'Choose an output directory below {root}; got {output}')
+    return output
+
+
+def validate_spec(spec, reuse_probabilities=False):
+    require(isinstance(spec, dict), 'Job specification must be an object')
+    jobs = spec.get('jobs')
+    require(isinstance(jobs, list) and bool(jobs), 'Provide at least one analysis job')
+    domains = spec.get('target_domains', ['binrushed', 'magrabia', 'rim_one', 'papila'])
+    require(isinstance(domains, list) and bool(domains)
+            and all(isinstance(d, str) and re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]*', d) for d in domains),
+            'target_domains must contain safe domain names')
+    require(len(domains) == len(set(domains)), 'target_domains contains duplicates')
+    seen, coverage, methods = set(), {}, {}
+    for job in jobs:
+        require(isinstance(job, dict), 'Each job must be an object')
+        for field in ('method', 'domain'):
+            value = job.get(field)
+            require(isinstance(value, str) and re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]*', value),
+                    f'{field} must be a safe directory name: {value!r}')
+        seed = job.get('seed')
+        require(type(seed) is int and seed >= 0, 'seed must be a non-negative integer')
+        for field in ('artifact', 'manifest', 'data_root') + (('probability_index',) if reuse_probabilities else ()):
+            require(isinstance(job.get(field), str) and bool(job[field].strip()), f'Missing job path: {field}')
+        key = job['method'], seed, job['domain']
+        require(key not in seen, f'Duplicate analysis job: {key}')
+        seen.add(key)
+        coverage.setdefault(key[:2], set()).add(job['domain'])
+        methods.setdefault(job['method'], set()).add((seed, job['domain']))
+    for key, present in coverage.items():
+        require(set(domains).issubset(present), f'Incomplete target domains for {key}: {sorted(set(domains) - present)}')
+    pairs = spec.get('pairs', [])
+    require(isinstance(pairs, list), 'pairs must be a list')
+    for pair in pairs:
+        require(isinstance(pair, dict), 'Each pair must be an object')
+        before, after = pair.get('before'), pair.get('after')
+        require(isinstance(before, str) and isinstance(after, str)
+                and before in methods and after in methods and before != after,
+                'Each pair must name two different methods in jobs')
+        require(methods[before] == methods[after], f'Paired methods have different seed/domain coverage: {before}, {after}')
+
+
+def export_probability_index(index_path, artifact_path, records):
+    dump(index_path, {
+        'source_prediction': str(Path(artifact_path).resolve()),
+        'source_sha256': sha_file(artifact_path),
+        'channels': ['OD', 'OC'], 'probability_dtype': 'float32',
+        'provenance': 'sigmoid of stored logits cast to FP32',
+        'records': records,
+    })
+
+
+def load_probability_index(index_path, artifact_path, image_ids):
+    index = json.loads(Path(index_path).read_text())
+    require(isinstance(index, dict), 'Probability index must be an object')
+    require(index.get('channels') == ['OD', 'OC'], 'Probability channel order must be OD, OC')
+    require(index.get('probability_dtype') == 'float32', 'Probability dtype must be float32')
+    require(index.get('source_sha256') == sha_file(artifact_path), 'Probability index source hash differs from artifact')
+    records = index.get('records')
+    require(isinstance(records, list) and all(isinstance(r, dict) for r in records), 'Invalid probability index records')
+    require([r.get('image_id') for r in records] == image_ids, 'Probability index image order differs from artifact')
+    return index
+
+
+def verified_probability_path(index_path, record):
+    root = Path(index_path).resolve().parent
+    name = record.get('file')
+    require(isinstance(name, str) and bool(name), 'Missing probability file path')
+    relative = Path(name)
+    require(not relative.is_absolute() and '..' not in relative.parts, 'Probability file must stay below its index directory')
+    path = (root / relative).resolve()
+    require(path != root and path.is_relative_to(root), 'Probability file escapes index directory')
+    require(record.get('shape') == [2, 768, 768], 'Probability shape must be [2, 768, 768]')
+    require(path.is_file(), f'Missing probability file: {path}')
+    require(sha_file(path) == record.get('sha256'), f'Probability file checksum mismatch: {path}')
+    return path
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--spec', required=True)
     parser.add_argument('--output', required=True)
     parser.add_argument('--source-root', required=True)
+    parser.add_argument('--private-root', default='runs', help='Analysis outputs must be below this directory (default: runs).')
+    parser.add_argument('--dry-run', action='store_true', help='Validate the job matrix and print paths without loading predictions or writing files.')
     parser.add_argument('--threads', type=int, default=2)
     parser.add_argument('--reuse-probabilities', action='store_true',
                         help='Require each job probability_index; verify and reuse existing FP32 files without exporting.')
@@ -66,6 +155,25 @@ def main():
     args = parser.parse_args()
     if args.threads < 1 or args.threads > 2:
         parser.error('CPU analysis is limited to at most two threads')
+    try:
+        spec = json.loads(Path(args.spec).read_text())
+        validate_spec(spec, args.reuse_probabilities)
+        output = private_output(args.output, args.private_root)
+        require(not output.exists() or (output.is_dir() and not any(output.iterdir())),
+                f'Output directory is not empty; choose a new analysis directory: {output}')
+        for job in spec['jobs']:
+            private_output(output / job['method'] / f"seed{job['seed']}" / job['domain'], output)
+        if args.dry_run:
+            for job in spec['jobs']:
+                print(f"{job['method']}/seed{job['seed']}/{job['domain']}: {job['artifact']}")
+            print(f"Dry run: {len(spec['jobs'])} jobs; output {output}; no files written.")
+            return
+        for job in spec['jobs']:
+            for field in ('artifact', 'manifest') + (('probability_index',) if args.reuse_probabilities else ()):
+                require(Path(job[field]).is_file(), f'Missing {field}: {job[field]}')
+            require(Path(job['data_root']).is_dir(), f"Missing data root: {job['data_root']}")
+    except (ValueError, OSError) as error:
+        parser.error(str(error))
     for key in ('OMP_NUM_THREADS', 'MKL_NUM_THREADS', 'OPENBLAS_NUM_THREADS', 'NUMEXPR_NUM_THREADS'):
         os.environ[key] = str(args.threads)
     os.environ['CUDA_VISIBLE_DEVICES'] = ''
@@ -81,8 +189,6 @@ def main():
     if args.compute_proxy:
         from c3tta.losses.multitask import soft_vcdr_from_masks
 
-    spec = json.loads(Path(args.spec).read_text())
-    output = Path(args.output).resolve()
     output.mkdir(parents=True, exist_ok=True)
     start = time.time()
 
@@ -134,23 +240,22 @@ def main():
         artifact = torch.load(job['artifact'], map_location='cpu', weights_only=True, mmap=True)
         meta = artifact['metadata']
         if 'source_seed' in meta:
-            assert int(meta['source_seed']) == seed
+            require(int(meta['source_seed']) == seed, 'Artifact source seed differs from job')
         manifest_sha = sha_file(job['manifest'])
-        assert meta.get('inference_manifest_sha256', manifest_sha) == manifest_sha
+        require(meta.get('inference_manifest_sha256', manifest_sha) == manifest_sha, 'Artifact manifest hash differs from job')
         if job.get('expected_checkpoint_sha256'):
-            assert meta['checkpoint_sha256'] == job['expected_checkpoint_sha256']
+            require(meta['checkpoint_sha256'] == job['expected_checkpoint_sha256'], 'Checkpoint hash mismatch')
         if job.get('expected_manifest_sha256'):
-            assert manifest_sha == job['expected_manifest_sha256']
+            require(manifest_sha == job['expected_manifest_sha256'], 'Manifest hash mismatch')
         logits = artifact['predictions']['seg_logits']
-        assert logits.ndim == 4 and logits.shape[1:] == (2, 768, 768), tuple(logits.shape)
+        require(logits.ndim == 4 and logits.shape[1:] == (2, 768, 768), f'Unexpected logit shape: {tuple(logits.shape)}')
+        require(logits.shape[0] == len(artifact['image_ids']) > 0,
+                'Logit count must match a non-empty image list')
+        require(len(set(artifact['image_ids'])) == len(artifact['image_ids']), 'Duplicate artifact image IDs')
         probability_index = None
         if args.reuse_probabilities:
             index_path = Path(job['probability_index']).resolve()
-            probability_index = json.loads(index_path.read_text())
-            assert probability_index['channels'] == ['OD', 'OC']
-            assert probability_index['probability_dtype'] == 'float32'
-            assert probability_index['source_sha256'] == sha_file(job['artifact'])
-            assert [r['image_id'] for r in probability_index['records']] == artifact['image_ids']
+            probability_index = load_probability_index(index_path, job['artifact'], artifact['image_ids'])
         if key not in gt_cache:
             rows = read_manifest(job['manifest'])
             truth = []
@@ -169,17 +274,19 @@ def main():
                 truth.append(entry)
             gt_cache[key] = truth
         truth = gt_cache[key]
-        assert artifact['image_ids'] == [t['id'] for t in truth]
-        out = output / method / f'seed{seed}' / domain
+        require(artifact['image_ids'] == [t['id'] for t in truth], 'Artifact image order differs from manifest')
+        out = private_output(output / method / f'seed{seed}' / domain, output)
         out.mkdir(parents=True, exist_ok=True)
         probs_dir = out / 'probabilities'
         if not args.reuse_probabilities:
             probs_dir.mkdir(parents=True, exist_ok=True)
+            index_path = probs_dir / 'index.json'
+        index_records = []
         group = []
         stored_soft = artifact['predictions'].get('soft_vcdr')
         for i, target in enumerate(truth):
             prob = torch.sigmoid(logits[i].float())
-            assert bool(torch.isfinite(prob).all())
+            require(bool(torch.isfinite(prob).all()), 'Non-finite probability values')
             arr = prob.numpy()
             mask = arr >= .5
             pred_d = [extent(ch) for ch in mask]
@@ -190,12 +297,10 @@ def main():
             ratio_error = pred_ratio - target_ratio if ratio_valid else None
             if probability_index is not None:
                 old = probability_index['records'][i]
-                probability_path = (index_path.parent / old['file']).resolve()
-                assert probability_path.is_relative_to(index_path.parent)
-                assert sha_file(probability_path) == old['sha256']
+                probability_path = verified_probability_path(index_path, old)
                 saved = np.load(probability_path, mmap_mode='r', allow_pickle=False)
-                assert list(saved.shape) == old['shape'] == [2, 768, 768]
-                assert saved.dtype == np.float32 and np.array_equal(saved, arr)
+                require(list(saved.shape) == [2, 768, 768], 'Saved probability array has wrong shape')
+                require(saved.dtype == np.float32 and np.array_equal(saved, arr), 'Saved probabilities differ from artifact')
             else:
                 probability_path = probs_dir / (f'{i:04d}_' + hashlib.sha256(target['id'].encode()).hexdigest()[:16] + '.npy')
                 temp = probability_path.with_suffix('.npy.tmp')
@@ -218,6 +323,9 @@ def main():
                    'probability_file_sha256': sha_file(probability_path),
                    'source_logit_dtype': str(logits.dtype), 'checkpoint_sha256': meta.get('checkpoint_sha256'),
                    'prediction_artifact_path': job['artifact']}
+            if not args.reuse_probabilities:
+                index_records.append({'image_id': target['id'], 'file': probability_path.name,
+                                      'sha256': row['probability_file_sha256'], 'shape': list(arr.shape)})
             if args.compute_proxy:
                 row.update(soft_vcdr_target_native_moment=target['soft_native'],
                            soft_vcdr_target_resized_moment=target['soft_resized'],
@@ -237,6 +345,8 @@ def main():
                             part+'_diameter_same_grid_signed_error_px': delta_px,
                             part+'_diameter_same_grid_absolute_error_px': abs(delta_px)})
             group.append(row)
+        if not args.reuse_probabilities:
+            export_probability_index(index_path, job['artifact'], index_records)
         summary = {'method': method, 'seed': seed, 'domain': domain, 'n_total': len(group),
                    'n_vcdr_valid': sum(r['hard_vcdr_valid'] for r in group),
                    'n_pred_od_nonempty': sum(r['od_prediction_nonempty'] for r in group),
@@ -251,6 +361,7 @@ def main():
                    'probability_dtype': 'float32', 'n_probability_files': len(group),
                    'checkpoint_epoch': meta.get('checkpoint_epoch')}
         summary['probability_files_reused'] = args.reuse_probabilities
+        summary['probability_index'] = str(index_path)
         if args.compute_proxy:
             summary['proxy_statistics'] = {
                 'soft_prediction_vs_hard_prediction': pair_stats(group, 'soft_vcdr_stored', 'hard_vcdr_prediction'),
@@ -261,7 +372,7 @@ def main():
                 'reconstructed_soft_vs_stored': pair_stats(group, 'soft_vcdr_prediction_reconstructed', 'soft_vcdr_stored')}
         if job.get('expected_hard_vcdr_mae') is not None:
             error = abs(summary['metrics']['hard_vcdr_absolute_error'] - job['expected_hard_vcdr_mae'])
-            assert error < 1e-7, (job, error)
+            require(error < 1e-7, f'Hard vCDR differs from expected result: {error}')
             summary['hard_vcdr_mae_difference_from_existing_audit'] = error
         write_csv(out / 'per_image.csv', group)
         dump(out / 'summary.json', summary)
@@ -285,7 +396,7 @@ def main():
             by_seed = []
             for seed in seeds:
                 selected = [r for r in jobs if r['method'] == method and r['seed'] == seed and r['domain'] in target_domains]
-                assert len(selected) == len(target_domains)
+                require(len(selected) == len(target_domains), 'Incomplete target-domain aggregate')
                 by_seed.append(avg([r['metrics'][m] for r in selected]))
             entry['four_target_macro'][m] = moments(by_seed)
         aggregates[method] = entry
@@ -325,8 +436,17 @@ def main():
             'probability_export': 'One .npy per image, [OD,OC] channels, shape 2x768x768, sigmoid(stored logits cast to FP32). These are FP32 files derived from previously quantized FP16 logits and do not recover unquantized network outputs.',
             'aggregation': 'Four target domains equally averaged within each seed; across-seed mean and sample SD (ddof=1). Source validation kept separate.',
             'pairing': 'Exact method/seed/domain/image_id; all cases retained, including PAPILA outliers.',
-            'proxy_statistics': 'Per-job moment targets/statistics computed only for supplied jobs.' if args.compute_proxy else 'Existing soft_vcdr_evidence_20260921 statistics reused through supplied spec; no rerun of the 75-artifact proxy study.'},
+            'proxy_statistics': 'Per-job moment targets/statistics computed only for supplied jobs.' if args.compute_proxy else 'Proxy statistics were not computed; optional external evidence is recorded from the supplied spec.'},
         'reused_proxy_evidence': spec.get('reused_proxy_evidence')})
+    reuse_spec = dict(spec)
+    reuse_spec['jobs'] = []
+    for job, summary in zip(spec['jobs'], jobs):
+        reused = dict(job)
+        for field in ('artifact', 'manifest', 'data_root'):
+            reused[field] = str(Path(job[field]).resolve())
+        reused['probability_index'] = summary['probability_index']
+        reuse_spec['jobs'].append(reused)
+    dump(output / 'reuse_jobs.json', reuse_spec)
 
 
 if __name__ == '__main__':

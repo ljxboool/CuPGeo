@@ -274,12 +274,6 @@
       "source_sha256": "be722bfce672a79ac014cab43cae069f8b4aeee1a0bf314700e76651c9f0c197"
     },
     {
-      "file": "scripts/analyze_ratio_geometry.py",
-      "source_group": "archived_probability_analysis",
-      "source_relative_path": "archive/2026-09-22/bropaper1_paper_only/bropaper1/experiments/mechanism_controls_20260922/analysis/analyze_predictions.py",
-      "source_sha256": "9e7a3d08a4e61ca1a3fa9474808fb1ac3fe4269d5f2791a1321622716f98b747"
-    },
-    {
       "file": "scripts/build_fundus_dg_protocol.py",
       "source_group": "existing_core_package",
       "source_relative_path": "icasspcode/scripts/build_fundus_dg_protocol.py",
@@ -382,9 +376,12 @@
     "docs/VALIDATION.md",
     "pyproject.toml",
     "scripts/aggregate_paper_domains.py",
+    "scripts/analyze_ratio_geometry.py",
     "scripts/check_release.py",
     "scripts/plan_experiments.py",
     "scripts/plan_paper_evaluation.py",
+    "tests/test_geometry_integration.py",
+    "tests/test_geometry_workflow.py",
     "tests/test_paper_aggregation.py",
     "tests/test_paper_evaluation_plan.py",
     "tests/test_release_hygiene.py",
@@ -395,5 +392,19 @@
     "paper metrics",
     "external baselines"
   ],
-  "publication_scope": "source-only; excludes datasets, weights, and per-seed experiment outputs"
+  "publication_scope": "source-only; excludes datasets, weights, and per-seed experiment outputs",
+  "adapted_files": [
+    {
+      "file": "scripts/analyze_ratio_geometry.py",
+      "source_group": "archived_probability_analysis",
+      "source_relative_path": "archive/2026-09-22/bropaper1_paper_only/bropaper1/experiments/mechanism_controls_20260922/analysis/analyze_predictions.py",
+      "source_sha256": "9e7a3d08a4e61ca1a3fa9474808fb1ac3fe4269d5f2791a1321622716f98b747",
+      "release_sha256": "e1aed4e93fd73d4b9e0e6e62afc1906941f52ec1634358f54e33884586837d67",
+      "adaptations": [
+        "Validate job coverage and output paths before analysis",
+        "Export probability indexes and reuse specifications",
+        "Keep artifact and array integrity checks active under optimized Python"
+      ]
+    }
+  ]
 }

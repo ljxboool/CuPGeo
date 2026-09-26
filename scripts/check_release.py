@@ -122,9 +122,13 @@ def main() -> None:
     manifest = json.loads((ROOT / "SOURCE_MANIFEST.json").read_text())
     for item in manifest["copied_files"]:
         require(actual[item["file"]] == item["source_sha256"], item["file"])
+    for item in manifest.get("adapted_files", []):
+        require(actual[item["file"]] == item["release_sha256"], item["file"])
     print(f"PASS: {sum(p.suffix == '.py' for p in files)} Python files parse; {len(configs)} configs resolve")
     print(f"PASS: stage-2 ablation switches and relative data/weight paths; {len(checksums)} checksums")
     print(f"PASS: {len(manifest['copied_files'])} copied files match their recorded source hashes")
+    if manifest.get("adapted_files"):
+        print(f"PASS: {len(manifest['adapted_files'])} adapted files match release hashes; original source hashes retained")
     print("Checked release content and Git-tracked paths; ignored local runs/data are not release artifacts.")
     print("This does not validate full training, numerical reproduction, credentials, or licensing.")
 

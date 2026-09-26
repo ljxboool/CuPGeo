@@ -99,7 +99,7 @@ python3 -m scripts.plan_experiments --suite matched --seeds 0 1 2
 
 仓库只发布**源码、配置、测试与说明**，不含眼底数据、预训练或训练权重、各 seed 的 checkpoint、预测、指标文件、凭据与服务器启动脚本。发布检查验证代码语法、配置一致性与文件哈希；代码公开本身不等于重新跑出论文数值。
 
-[源码自动检查](.github/workflows/source-checks.yml)会在推送和拉取请求时运行，核查发布文件与论文训练、评估计划，无需下载数据集或模型权重。
+[自动检查](.github/workflows/source-checks.yml)会在推送和拉取请求时运行：Python 3.10/3.12 核查发布文件与论文协议，Python 3.11 运行完整测试及 CPU 合成数据训练、预测和评估。比例分析测试还会验证概率图首次导出与复用时的指标完全一致。无需下载数据集或预训练权重。
 
 ~~~bash
 python3 -m scripts.check_release

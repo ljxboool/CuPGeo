@@ -112,10 +112,23 @@ After generating frozen predictions, copy `configs/geometry_jobs.example.json` t
 ```bash
 python3 -m scripts.analyze_ratio_geometry \
   --spec runs/paper/geometry_jobs.json --output runs/paper/geometry_analysis \
-  --source-root . --threads 2 --compute-proxy
+  --source-root . --threads 2 --compute-proxy --dry-run
 ```
 
-The script writes probability arrays and per-image records, so keep its output below ignored `runs/`. For Table 5, include matched Full and w/o ratio predictions for all three seeds and four targets; `--compute-proxy` calculates moment targets for those jobs. Check the complete job matrix and source checkpoint identities before quoting aggregate results.
+Remove `--dry-run` to load predictions and compute the analysis. The dry run validates the job matrix and output paths without PyTorch or data access. Duplicate jobs, missing target domains, mismatched paired-method coverage, and nonempty output directories are rejected before analysis starts.
+
+The script writes probability arrays and per-image records below ignored `runs/`. For Table 5, include matched Full and w/o ratio predictions for all three seeds and four targets; `--compute-proxy` calculates moment targets for those jobs. Check the source checkpoint identities before quoting aggregate results.
+
+Each job exports `probabilities/index.json` with the source artifact hash, image order, and array checksums. A completed analysis also writes `reuse_jobs.json`. Use it to repeat or extend the analysis without writing another set of probability arrays:
+
+```bash
+python3 -m scripts.analyze_ratio_geometry \
+  --spec runs/paper/geometry_analysis/reuse_jobs.json \
+  --output runs/paper/geometry_recheck --source-root . \
+  --threads 2 --compute-proxy --reuse-probabilities
+```
+
+Reuse verifies file hashes and exact agreement with probabilities reconstructed from the stored logits. It still reads the source artifacts and labels. Select a new output directory for each analysis; the earlier arrays and index remain unchanged.
 
 ## Metrics and aggregation
 
