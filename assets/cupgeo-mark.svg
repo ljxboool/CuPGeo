@@ -1,5 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" role="img" aria-labelledby="cupgeo-mark-title">
   <title id="cupgeo-mark-title">CuPGeo: nested optic disc and cup geometry</title>
+  <style>
+    @media (prefers-color-scheme:dark){
+      #cupgeo-mark-surface stop:first-child{stop-color:#29413F}
+      #cupgeo-mark-surface stop:last-child{stop-color:#1B2B2C}
+      .frame{stroke:#536D61}
+      .inset{stroke-opacity:.15}
+      .axis{stroke:#C5DCCE;stroke-opacity:.75}
+    }
+  </style>
   <defs>
     <linearGradient id="cupgeo-mark-surface" x1="10" y1="4" x2="62" y2="70" gradientUnits="userSpaceOnUse">
       <stop stop-color="#FFFFFF"/>
@@ -15,13 +24,13 @@
     </linearGradient>
   </defs>
   <rect x="3" y="4" width="66" height="66" rx="18" fill="#173D43" opacity=".07"/>
-  <rect x="3" y="2" width="66" height="66" rx="18" fill="url(#cupgeo-mark-surface)" stroke="#CDDCD5"/>
-  <rect x="5.5" y="4.5" width="61" height="61" rx="15.5" fill="none" stroke="#FFFFFF" stroke-opacity=".9"/>
+  <rect class="frame" x="3" y="2" width="66" height="66" rx="18" fill="url(#cupgeo-mark-surface)" stroke="#CDDCD5"/>
+  <rect class="inset" x="5.5" y="4.5" width="61" height="61" rx="15.5" fill="none" stroke="#FFFFFF" stroke-opacity=".9"/>
   <ellipse cx="36" cy="35" rx="21.5" ry="25" transform="rotate(-8 36 35)" fill="url(#cupgeo-mark-disc)" stroke="#337F80" stroke-width="1.7"/>
   <path d="M23 17.5c-7 6.5-8.9 17.9-5.5 27.2" fill="none" stroke="#FFFFFF" stroke-opacity=".75" stroke-width="1.6" stroke-linecap="round"/>
   <ellipse cx="36.5" cy="35.5" rx="11.5" ry="16" transform="rotate(-8 36.5 35.5)" fill="url(#cupgeo-mark-cup)" stroke="#C18463" stroke-width="1.7"/>
   <path d="M31.5 23c-3.6 3-5.3 8.6-4.5 14" fill="none" stroke="#FFFFFF" stroke-opacity=".75" stroke-width="1.4" stroke-linecap="round"/>
-  <path d="M36 7v5M36 58v5" fill="none" stroke="#173D43" stroke-opacity=".55" stroke-width="1.5" stroke-linecap="round"/>
-  <path d="M59.5 23v25M57.5 23h4M57.5 48h4" fill="none" stroke="#337F80" stroke-opacity=".5" stroke-width="1.2" stroke-linecap="round"/>
+  <path class="axis" d="M36 7v5M36 58v5" fill="none" stroke="#173D43" stroke-opacity=".55" stroke-width="1.5" stroke-linecap="round"/>
+  <path class="axis" d="M59.5 23v25M57.5 23h4M57.5 48h4" fill="none" stroke="#337F80" stroke-opacity=".5" stroke-width="1.2" stroke-linecap="round"/>
   <circle cx="36.5" cy="35.5" r="1.8" fill="#173D43" fill-opacity=".72"/>
 </svg>

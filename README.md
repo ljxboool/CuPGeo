@@ -1,3 +1,4 @@
+<a id="top"></a>
 <p align="center"><img src="assets/cupgeo-mark.svg" alt="CuPGeo mark" width="72" height="72"></p>
 <h1 align="center">CuPGeo</h1>
 <p align="center">
@@ -14,7 +15,9 @@
   <a href="#method">Method</a> ·
   <a href="#quick-start">Quick start</a> ·
   <a href="#paper-protocol">Paper protocol</a> ·
+  <a href="#reported-results">Results</a> ·
   <a href="#repository-map">Code map</a> ·
+  <a href="#citation">Cite</a> ·
   <a href="README.zh-CN.md">中文</a>
 </p>
 
@@ -25,8 +28,14 @@
 CuPGeo treats the optic cup as a geometric anchor. A vertical region allocation (VRA) head provides a bounded cup-localization prior; cup-preserving (CP) composition completes the optic disc with residual rim probability; and a differentiable soft-vCDR objective supervises their relative vertical extent. The model trains on labeled **source** images and performs frozen inference on unseen target domains.
 
 <p align="center">
-  <a href="assets/cupgeo-method.svg"><img src="assets/cupgeo-method.svg" alt="CuPGeo method: layered shared features, five-region cup refinement, nested OD/OC outputs, and source-mask moment-ratio supervision" width="100%"></a>
+  <picture>
+    <source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/cupgeo-method-mobile-dark.svg">
+    <source media="(max-width: 640px)" srcset="assets/cupgeo-method-mobile.svg">
+    <source media="(prefers-color-scheme: dark)" srcset="assets/cupgeo-method-dark.svg">
+    <img src="assets/cupgeo-method.svg" alt="CuPGeo method: layered shared features, five-region cup refinement, nested OD/OC outputs, and source-mask moment-ratio supervision" width="100%">
+  </picture>
 </p>
+<p align="center"><sub>OD: optic disc · OC: optic cup · Teal: disc/rim · Copper: cup · Conceptual illustration<br><a href="assets/cupgeo-method.svg">Full-size figure</a> · <a href="assets/cupgeo-method-mobile.svg">Portrait view</a></sub></p>
 
 | Geometry | What it contributes |
 | :--- | :--- |
@@ -50,19 +59,46 @@ python3 -m scripts.check_release
 python3 -m scripts.plan_experiments --suite matched --seeds 0 1 2
 ~~~
 
-Datasets and the DINOv3-L/16 backbone are obtained separately. See [data preparation](docs/DATA.md) and the [experiment map](docs/EXPERIMENTS.md) before executing training. The original backbone SHA-256 is <code>45172f209c9583c40538afc26b60a07033e6fcc2e8c30228338e6b2e932e7941</code>; a different upstream revision is not the identical initialization.
+Datasets and the DINOv3-L/16 backbone are obtained separately. See [data preparation](docs/DATA.md) and the [experiment map](docs/EXPERIMENTS.md) before executing training.
+
+<details>
+<summary>Exact backbone identity</summary>
+
+The original backbone SHA-256 is:
+
+```text
+45172f209c9583c40538afc26b60a07033e6fcc2e8c30228338e6b2e932e7941
+```
+
+A different upstream revision is not the identical initialization. See the [backbone preparation instructions](docs/DATA.md).
+
+</details>
 
 ## <img src="assets/icon-protocol.svg" alt="" width="22" height="22"> Paper protocol
 
 **Training data.** REFUGE supplies 320 training images and 80 held-out images for CuPGeo checkpoint and hyperparameter selection. The four target evaluation sets are BinRushed (39), Magrabia (19), RIM-ONE DL (174), and PAPILA (84). CuPGeo uses no target image or label for training or model selection. [Prepare the exact splits](docs/DATA.md) before launching a run.
+
+<p align="center">
+  <picture>
+    <source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/cupgeo-protocol-mobile-dark.svg">
+    <source media="(max-width: 640px)" srcset="assets/cupgeo-protocol-mobile.svg">
+    <source media="(prefers-color-scheme: dark)" srcset="assets/cupgeo-protocol-dark.svg">
+    <img src="assets/cupgeo-protocol.svg" alt="Matched CuPGeo protocol: REFUGE source split, CP 120 epochs, five independent 120-epoch continuations, four frozen target evaluations, and domain-before-seed aggregation" width="100%">
+  </picture>
+</p>
+<p align="center"><sub>Matched CuPGeo runs · <a href="assets/cupgeo-protocol.svg">Full-size protocol</a> · <a href="docs/EXPERIMENTS.md">Executable recipes</a></sub></p>
 
 | Manuscript experiment | Initialization and budget | Code path |
 | :--- | :--- | :--- |
 | Main comparison (Table 1) | **240 epochs:** CuPGeo uses the matched CP 120 + Full 120 checkpoint; MixStyle and DSU each train for 240 epochs from the pretrained backbone | `--suite matched` for CuPGeo; `--suite single` for shared-backbone baselines |
 | Component ablation (Table 2) | CP pretraining for 120 epochs; independent 120-epoch continuations from the **same-seed CP best checkpoint**, including CP-only | `--suite matched` |
 | Stop-gradient ablation (Table 3) | The Full and w/o SG continuations share the same-seed CP initialization and all other objectives | `--suite matched --variants full no_sg` |
-| Soft-vCDR weight study (Table 4, source validation) | Same matched CP initialization; seven weights from 0.25 to 3.00, with 2.00 supplied by the full-model run | `--suite matched --reuse-cp --variants ratio_025 ...` |
+| Soft-vCDR weight study (Table 4, source validation) | Same matched CP initialization; seven weights from 0.25 to 3.00, with 2.00 supplied by the full-model run | [Commands for six additional weights](docs/EXPERIMENTS.md#source-validation-weight-study) |
 | Ratio-proxy validation (Table 5) | Reuse frozen Full and w/o ratio predictions; no additional training | `scripts/analyze_ratio_geometry.py` |
+
+<a id="reported-results"></a>
+
+### <img src="assets/icon-results.svg" alt="" width="22" height="22"> Reported results
 
 The manuscript's 240-epoch Table 1 reports four-domain equal-weight means ± sample SD over seeds 0–2 for the shared-backbone comparison:
 
@@ -71,6 +107,8 @@ The manuscript's 240-epoch Table 1 reports four-domain equal-weight means ± sam
 | MixStyle | 0.7375 ± 0.0070 | 0.6339 ± 0.0020 | 0.1405 ± 0.0106 | 31.30 ± 2.05 |
 | DSU | 0.7395 ± 0.0096 | 0.6362 ± 0.0026 | 0.1349 ± 0.0038 | 32.71 ± 3.57 |
 | **CuPGeo** | **0.7962 ± 0.0031** | **0.7019 ± 0.0078** | **0.0949 ± 0.0085** | **0.00 ± 0.00** |
+
+<sub>Mean Dice = (OD Dice + OC Dice) / 2. CVR is the percentage of images with any predicted cup pixel outside the predicted disc. vCDR MAE uses thresholded masks. ↑ higher is better; ↓ lower is better.</sub>
 
 These in-repository model runs use seeds **0, 1, 2**, 768×768 inputs, frozen DINOv3-L/16 with rank-8 QKV LoRA in the last four blocks, a Pyramid-FPN decoder, fp16, batch size 4, four-step accumulation, and AdamW. Decoder/LoRA learning rates are 2.5×10⁻⁴ / 5×10⁻⁵, with weight decay 10⁻⁴, five warmup epochs, and cosine decay to 10% of the initial rate. The source-validation **Mean Dice** selects `best.pt` in every stage. [Full hyperparameters and ablation switches](docs/EXPERIMENTS.md) are specified in the configs.
 
@@ -118,7 +156,7 @@ Score every seed on all four targets, then run [<code>scripts/aggregate_paper_do
 
 The historical <code>c3tta</code> Python namespace is retained for checkpoint compatibility. The current paper recipes use source-only training.
 
-## Release scope
+## <img src="assets/icon-release.svg" alt="" width="22" height="22"> Release scope
 
 This repository contains **code, configurations, tests, and documentation**. It does **not** contain retinal datasets, pretrained or trained weights, per-seed checkpoints, predictions, score files, credentials, or server launch scripts. The release checker verifies syntax, configuration consistency, source hashes, and the source-only file inventory; it is not a claim that publishing the package reproduced the paper's numerical results.
 
@@ -131,4 +169,12 @@ python3 -m pytest -q
 CUDA_VISIBLE_DEVICES='' OMP_NUM_THREADS=2 python3 -m scripts.smoke_test
 ~~~
 
-The smoke test uses synthetic images and a tiny backbone. Dataset access and pretrained-model terms remain with their respective providers. The source code is available under the [MIT License](LICENSE). For attribution, see [<code>CITATION.cff</code>](CITATION.cff); publication details will be added when available.
+The smoke test uses synthetic images and a tiny backbone. Dataset access and pretrained-model terms remain with their respective providers. The source code is available under the [MIT License](LICENSE).
+
+<a id="citation"></a>
+
+## <img src="assets/icon-citation.svg" alt="" width="22" height="22"> Citation
+
+Please cite the CuPGeo manuscript when using this code. Author names and the paper title are maintained in [CITATION.cff](CITATION.cff); publication details will be added when available.
+
+<p align="center"><sub><a href="#top">Back to top ↑</a> · <a href="LICENSE">MIT License</a> · <a href="docs/VISUALS.md">Figure sources</a></sub></p>
