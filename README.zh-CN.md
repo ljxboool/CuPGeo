@@ -28,10 +28,10 @@ CuPGeo 以视杯为几何锚点：**VRA** 给杯位置提供有界的竖直先�
     <source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/cupgeo-method-mobile-dark.svg">
     <source media="(max-width: 640px)" srcset="assets/cupgeo-method-mobile.svg">
     <source media="(prefers-color-scheme: dark)" srcset="assets/cupgeo-method-dark.svg">
-    <img src="assets/cupgeo-method.svg" alt="CuPGeo 方法示意：多尺度特征、五区域视杯校正、嵌套杯盘输出与源域二阶矩比例监督" width="100%">
+    <img src="assets/cupgeo-method.svg" alt="CuPGeo 框架：共享特征经 VRA 和 CP 生成嵌套杯盘预测，下方三个细节面板分别展示垂直区域分配、保杯组合与 soft-vCDR 监督" width="100%">
   </picture>
 </p>
-<p align="center"><sub>OD：视盘 · OC：视杯 · 青绿色：视盘/盘缘 · 暖铜色：视杯 · 概念示意图<br><a href="assets/cupgeo-method.svg">查看大图</a> · <a href="assets/cupgeo-method-mobile.svg">竖版图</a></sub></p>
+<p align="center"><sub>浅蓝：VRA · 灰绿：CP · 淡紫：soft-vCDR · 合成矢量示意图<br>OD：视盘 · OC：视杯 · <a href="assets/cupgeo-method.svg">查看大图</a> · <a href="assets/cupgeo-method-mobile.svg">竖版图</a></sub></p>
 
 | 模块 | 作用 |
 | :--- | :--- |
@@ -79,10 +79,10 @@ CuPGeo 的源域只使用 **REFUGE**：320 张训练，80 张留出用于 checkp
     <source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/cupgeo-protocol-mobile-dark.svg">
     <source media="(max-width: 640px)" srcset="assets/cupgeo-protocol-mobile.svg">
     <source media="(prefers-color-scheme: dark)" srcset="assets/cupgeo-protocol-dark.svg">
-    <img src="assets/cupgeo-protocol.svg" alt="CuPGeo 匹配训练流程：REFUGE 源域划分、CP 120 epochs、五个独立的 120 epochs 续训分支、四域冻结评估与先域后 seed 汇总" width="100%">
+    <img src="assets/cupgeo-protocol.svg" alt="CuPGeo 匹配训练流程：源验证集选模、CP 120 epochs 加五个独立的 120 epochs 续训分支、四个目标域冻结评估与先域后 seed 汇总" width="100%">
   </picture>
 </p>
-<p align="center"><sub>CuPGeo 匹配训练流程 · <a href="assets/cupgeo-protocol.svg">查看大图</a> · <a href="docs/EXPERIMENTS.md">完整执行命令</a></sub></p>
+<p align="center"><sub>CuPGeo 匹配 240-epoch 训练流程 · 仅使用源验证集选模 · <a href="assets/cupgeo-protocol.svg">查看大图</a> · <a href="docs/EXPERIMENTS.md">完整执行命令</a></sub></p>
 
 | 论文实验 | 初始化与训练预算 | 入口 |
 | :--- | :--- | :--- |

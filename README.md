@@ -32,10 +32,10 @@ CuPGeo treats the optic cup as a geometric anchor. A vertical region allocation 
     <source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/cupgeo-method-mobile-dark.svg">
     <source media="(max-width: 640px)" srcset="assets/cupgeo-method-mobile.svg">
     <source media="(prefers-color-scheme: dark)" srcset="assets/cupgeo-method-dark.svg">
-    <img src="assets/cupgeo-method.svg" alt="CuPGeo method: layered shared features, five-region cup refinement, nested OD/OC outputs, and source-mask moment-ratio supervision" width="100%">
+    <img src="assets/cupgeo-method.svg" alt="CuPGeo framework: shared features feed VRA and CP before nested cup-disc prediction; three detail panels explain vertical allocation, cup-preserving composition, and soft-vCDR supervision" width="100%">
   </picture>
 </p>
-<p align="center"><sub>OD: optic disc · OC: optic cup · Teal: disc/rim · Copper: cup · Conceptual illustration<br><a href="assets/cupgeo-method.svg">Full-size figure</a> · <a href="assets/cupgeo-method-mobile.svg">Portrait view</a></sub></p>
+<p align="center"><sub>Blue: VRA · Sage: CP · Lavender: soft-vCDR · Synthetic vector illustration<br>OD: optic disc · OC: optic cup · <a href="assets/cupgeo-method.svg">Full-size figure</a> · <a href="assets/cupgeo-method-mobile.svg">Portrait view</a></sub></p>
 
 | Geometry | What it contributes |
 | :--- | :--- |
@@ -83,10 +83,10 @@ A different upstream revision is not the identical initialization. See the [back
     <source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/cupgeo-protocol-mobile-dark.svg">
     <source media="(max-width: 640px)" srcset="assets/cupgeo-protocol-mobile.svg">
     <source media="(prefers-color-scheme: dark)" srcset="assets/cupgeo-protocol-dark.svg">
-    <img src="assets/cupgeo-protocol.svg" alt="Matched CuPGeo protocol: REFUGE source split, CP 120 epochs, five independent 120-epoch continuations, four frozen target evaluations, and domain-before-seed aggregation" width="100%">
+    <img src="assets/cupgeo-protocol.svg" alt="Matched CuPGeo protocol: source-validation checkpoint selection, CP 120 epochs plus five independent 120-epoch continuations, frozen evaluation on four target domains, and domain-before-seed aggregation" width="100%">
   </picture>
 </p>
-<p align="center"><sub>Matched CuPGeo runs · <a href="assets/cupgeo-protocol.svg">Full-size protocol</a> · <a href="docs/EXPERIMENTS.md">Executable recipes</a></sub></p>
+<p align="center"><sub>Matched 240-epoch CuPGeo runs · Source-only checkpoint selection · <a href="assets/cupgeo-protocol.svg">Full-size protocol</a> · <a href="docs/EXPERIMENTS.md">Executable recipes</a></sub></p>
 
 | Manuscript experiment | Initialization and budget | Code path |
 | :--- | :--- | :--- |
