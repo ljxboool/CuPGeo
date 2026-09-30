@@ -1,71 +1,261 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="480" height="850" viewBox="0 0 480 850" role="img" aria-labelledby="title desc">
-  <title id="title">CuPGeo — compact architecture, portrait layout</title>
-  <desc id="desc">Compact architecture flow. A frozen DINOv3 backbone with trainable LoRA and Pyramid-FPN produces shared features. The segmentation head and vertical region allocation refine cup probability. Cup-preserving composition completes disc probability with a residual rim; stop-gradient affects only the cup-to-disc training path. A shared threshold yields nested masks. A training-only soft-vCDR loss compares predicted and source-mask moment ratios. Blue denotes frozen modules, peach trainable modules, and green fixed geometry or objectives. Input and mask thumbnails are synthetic vector schematics.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="510" height="1598" viewBox="0 0 510 1598" role="img" aria-labelledby="title desc">
+  <title id="title">CuPGeo — architecture and module details, portrait layout</title>
+  <desc id="desc">Paper-style architecture diagram: frozen DINOv3-L/16 with LoRA and Pyramid-FPN feeds segmentation and VRA heads. Lower panels expand vertical region allocation, cup-preserving composition, and soft-vCDR supervision. VRA uses a vertical cup prior and uncertainty-gated bounded correction. CP preserves cup probability while adding residual rim; SG affects the cup-to-disc training path only. Predicted and source-mask moments supply training-only soft-vCDR supervision. Input thumbnails and probability maps are synthetic vector illustrations, not dataset images or measured predictions.</desc>
   <defs>
-    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
-      <path d="M1 1L7 4L1 7Z" fill="#242424" />
+    <marker id="forward" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M1 1L9 5L1 9Z" fill="#657B86" />
     </marker>
-    <radialGradient id="fundus" cx=".65" cy=".44" r=".78">
-      <stop offset="0" stop-color="#CF8136" />
-      <stop offset="0.45" stop-color="#A75223" />
-      <stop offset="1" stop-color="#53251D" />
+    <marker id="prediction" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M1 1L9 5L1 9Z" fill="#008CFF" />
+    </marker>
+    <marker id="supervision" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M1 1L9 5L1 9Z" fill="#C87855" />
+    </marker>
+    <radialGradient id="cup-probability" cx=".60" cy=".42" r=".50">
+      <stop offset="0" stop-color="#FFFFFF" />
+      <stop offset="0.55" stop-color="#FFFFFF" />
+      <stop offset="1" stop-color="#000000" />
     </radialGradient>
+    <radialGradient id="disc-probability" cx=".60" cy=".42" r=".50">
+      <stop offset="0" stop-color="#FFFFFF" />
+      <stop offset="0.45" stop-color="#E9EEEE" />
+      <stop offset="0.85" stop-color="#9FA7AA" />
+      <stop offset="1" stop-color="#000000" />
+    </radialGradient>
+    <radialGradient id="fundus" cx=".60" cy=".42" r=".78">
+      <stop offset="0" stop-color="#D08C48" />
+      <stop offset="0.5" stop-color="#A95A2B" />
+      <stop offset="1" stop-color="#602A20" />
+    </radialGradient>
+    <linearGradient id="module-blue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#EFF5FA" />
+      <stop offset="1" stop-color="#CADDEC" />
+    </linearGradient>
+    <linearGradient id="module-green" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E4F3EB" />
+      <stop offset="1" stop-color="#BEDDCB" />
+    </linearGradient>
+    <linearGradient id="module-purple" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F0E8F7" />
+      <stop offset="1" stop-color="#D5C1E8" />
+    </linearGradient>
+    <linearGradient id="vertical-prior" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#23396E" />
+      <stop offset="0.26" stop-color="#336BA4" />
+      <stop offset="0.45" stop-color="#F6BC35" />
+      <stop offset="0.51" stop-color="#FFE486" />
+      <stop offset="0.57" stop-color="#F6BC35" />
+      <stop offset="0.78" stop-color="#336BA4" />
+      <stop offset="1" stop-color="#23396E" />
+    </linearGradient>
+    <linearGradient id="bounded-prior" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6D89A2" />
+      <stop offset="0.25" stop-color="#DBE3E7" />
+      <stop offset="0.43" stop-color="#EBC397" />
+      <stop offset="0.53" stop-color="#D59857" />
+      <stop offset="0.64" stop-color="#EBC397" />
+      <stop offset="0.8" stop-color="#DBE3E7" />
+      <stop offset="1" stop-color="#6D89A2" />
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M1 1L9 5L1 9Z" fill="#657B86" />
+    </marker>
   </defs>
-  <rect width="480" height="850" fill="#FFFFFF" id="canvas" />
-  <g font-family="Arial, Helvetica, sans-serif">
-    <text x="24" y="36" font-size="25" fill="#242424" font-weight="600">CuPGeo</text>
-    <text x="456" y="34" font-size="16" fill="#868B92" text-anchor="end">Source-only segmentation</text>
-    <text x="240" y="76" font-size="16" fill="#868B92" text-anchor="middle">Representation</text>
-    <path d="M24 71H160.39999999999998M319.6 71H456" fill="none" stroke="#C6CACF" stroke-width="1.3" />
-    <rect x="24" y="98" width="202" height="60" rx="9" fill="#DFECF8" />
-    <text x="125.0" y="134.0" font-size="19" fill="#242424" text-anchor="middle" data-contrast="on-pastel">DINOv3-L/16</text>
-    <rect x="245" y="98" width="74" height="60" rx="9" fill="#FBE4D5" />
-    <text x="282.0" y="134.0" font-size="17" fill="#242424" text-anchor="middle" data-contrast="on-pastel">LoRA</text>
-    <rect x="338" y="98" width="118" height="60" rx="9" fill="#FBE4D5" />
-    <text x="397.0" y="134.0" font-size="16" fill="#242424" text-anchor="middle" data-contrast="on-pastel">Pyramid-FPN</text>
-    <path d="M228 128H241" fill="none" stroke="#242424" stroke-width="1.5" marker-end="url(#arrow)" />
-    <path d="M321 128H334" fill="none" stroke="#242424" stroke-width="1.5" marker-end="url(#arrow)" />
-    <path d="M397 161V189H124V222" fill="none" stroke="#242424" stroke-width="1.5" marker-end="url(#arrow)" />
-    <path d="M358 189V222" fill="none" stroke="#242424" stroke-width="1.5" marker-end="url(#arrow)" />
-    <rect x="30" y="226" width="184" height="58" rx="9" fill="#FBE4D5" />
-    <text x="122.0" y="261.0" font-size="18" fill="#242424" text-anchor="middle" data-contrast="on-pastel">Segmentation head</text>
-    <rect x="266" y="226" width="184" height="58" rx="9" fill="#FBE4D5" />
-    <text x="358.0" y="261.0" font-size="20" fill="#242424" text-anchor="middle" data-contrast="on-pastel">VRA</text>
-    <path d="M217 253H262" fill="none" stroke="#242424" stroke-width="1.5" marker-end="url(#arrow)" />
-    <text x="239" y="243" font-size="16" fill="#B14A44" text-anchor="middle">Z<tspan baseline-shift="sub" font-size="70%">C</tspan></text>
-    <path d="M124 288V368H141" fill="none" stroke="#242424" stroke-width="1.5" marker-end="url(#arrow)" />
-    <path d="M358 288V368H339" fill="none" stroke="#242424" stroke-width="1.5" marker-end="url(#arrow)" />
-    <text x="116" y="326" font-size="18" fill="#B14A44" text-anchor="end">Z<tspan baseline-shift="sub" font-size="70%">C</tspan></text>
-    <text x="371" y="326" font-size="18" fill="#B14A44">B</text>
-    <rect x="145" y="338" width="190" height="60" rx="9" fill="#E2EFD9" />
-    <text x="240.0" y="362.0" font-size="19" fill="#242424" text-anchor="middle" data-contrast="on-pastel">Cup refine</text>
-    <text x="240.0" y="386.0" font-size="19" fill="#242424" text-anchor="middle" data-contrast="on-pastel">σ(Z<tspan baseline-shift="sub" font-size="70%">C</tspan> + B)</text>
-    <path d="M240 402V448" fill="none" stroke="#242424" stroke-width="1.5" marker-end="url(#arrow)" />
-    <text x="252" y="428" font-size="18" fill="#B14A44">P<tspan baseline-shift="sub" font-size="70%">C</tspan></text>
-    <path d="M27 254H16V490H141" fill="none" stroke="#242424" stroke-width="1.5" marker-end="url(#arrow)" />
-    <text x="29" y="425" font-size="18" fill="#B14A44">Z<tspan baseline-shift="sub" font-size="70%">R</tspan></text>
-    <rect x="145" y="452" width="190" height="76" rx="9" fill="#E2EFD9" />
-    <text x="240.0" y="484.0" font-size="18" fill="#242424" text-anchor="middle" data-contrast="on-pastel">CP composition</text>
-    <text x="240.0" y="508.0" font-size="18" fill="#242424" text-anchor="middle" data-contrast="on-pastel">SG on disc path</text>
-    <path d="M240 532V562" fill="none" stroke="#242424" stroke-width="1.5" marker-end="url(#arrow)" />
-    <rect x="67" y="566" width="346" height="60" rx="9" fill="#E2EFD9" />
-    <text x="240.0" y="602.0" font-size="20" fill="#242424" text-anchor="middle" data-contrast="on-pastel">Threshold 0.5 → OC ⊆ OD</text>
-    <path d="M243 548H440V676" fill="none" stroke="#242424" stroke-width="1.5" marker-end="url(#arrow)" stroke-dasharray="5 4" />
-    <text x="24" y="661" font-size="16" fill="#868B92" font-style="italic">Training only</text>
-    <rect x="24" y="680" width="192" height="56" rx="9" fill="#E2EFD9" />
-    <text x="120.0" y="702.0" font-size="18" fill="#242424" text-anchor="middle" data-contrast="on-pastel">Source-mask</text>
-    <text x="120.0" y="726.0" font-size="18" fill="#242424" text-anchor="middle" data-contrast="on-pastel">moments</text>
-    <rect x="250" y="680" width="206" height="56" rx="9" fill="#E2EFD9" />
-    <text x="353.0" y="702.0" font-size="18" fill="#242424" text-anchor="middle" data-contrast="on-pastel">Soft-vCDR</text>
-    <text x="353.0" y="726.0" font-size="18" fill="#242424" text-anchor="middle" data-contrast="on-pastel">Smooth L1 · λ = 2</text>
-    <path d="M219 708H246" fill="none" stroke="#242424" stroke-width="1.5" marker-end="url(#arrow)" stroke-dasharray="5 4" />
-    <text x="240" y="776" font-size="21" fill="#242424" text-anchor="middle" font-style="italic"><tspan>P</tspan><tspan baseline-shift="sub" font-size="70%">D</tspan><tspan> = </tspan><tspan>P</tspan><tspan baseline-shift="sub" font-size="70%">C</tspan><tspan> + (1 − </tspan><tspan>P</tspan><tspan baseline-shift="sub" font-size="70%">C</tspan><tspan>) ⊙ </tspan><tspan>P</tspan><tspan baseline-shift="sub" font-size="70%">R</tspan></text>
-    <rect x="16" y="797" width="448" height="37" rx="6" fill="#F5F5F5" />
-    <rect x="29" y="806" width="20" height="19" rx="3" fill="#DFECF8" />
-    <text x="57" y="821" font-size="16" fill="#242424">frozen</text>
-    <rect x="164" y="806" width="20" height="19" rx="3" fill="#FBE4D5" />
-    <text x="192" y="821" font-size="16" fill="#242424">trainable</text>
-    <rect x="320" y="806" width="20" height="19" rx="3" fill="#E2EFD9" />
-    <text x="348" y="821" font-size="16" fill="#242424">geometry</text>
+  <rect width="510" height="1598" fill="#FFFFFF" id="canvas" />
+  <g font-family="Times New Roman, Times, serif">
+    <text x="20" y="35" font-size="29" fill="#242424" font-weight="700" font-style="italic">CuPGeo</text>
+    <text x="490" y="33" font-size="16" fill="#868B92" text-anchor="end">Architecture &amp; geometric supervision</text>
+    <rect x="20" y="55" width="470" height="273" fill="#FBFDFF" stroke="#AFCADB" stroke-dasharray="6 4" />
+    <rect x="37" y="75" width="436" height="46" rx="2" fill="url(#module-blue)" />
+    <text x="255.0" y="104.0" font-size="20" fill="#242424" text-anchor="middle" data-contrast="on-pastel">DINOv3-L/16 + LoRA → Pyramid-FPN</text>
+    <path d="M132 124V158" fill="none" stroke="#242424" stroke-width="1.5" marker-end="url(#arrow)" />
+    <path d="M377 124V158" fill="none" stroke="#242424" stroke-width="1.5" marker-end="url(#arrow)" />
+    <rect x="37" y="162" width="194" height="46" rx="2" fill="url(#module-blue)" />
+    <text x="134.0" y="191.0" font-size="20" fill="#242424" text-anchor="middle" data-contrast="on-pastel">Segmentation head</text>
+    <rect x="279" y="162" width="194" height="46" rx="2" fill="url(#module-blue)" />
+    <text x="376.0" y="191.0" font-size="21" fill="#242424" text-anchor="middle" data-contrast="on-pastel">VRA</text>
+    <path d="M234 185H275" fill="none" stroke="#242424" stroke-width="1.5" marker-end="url(#arrow)" />
+    <text x="255" y="176" font-size="17" fill="#242424" text-anchor="middle">Z<tspan baseline-shift="sub" font-size="70%">C</tspan></text>
+    <path d="M132 211V264H150" fill="none" stroke="#242424" stroke-width="1.5" marker-end="url(#arrow)" />
+    <path d="M377 211V264H359" fill="none" stroke="#242424" stroke-width="1.5" marker-end="url(#arrow)" />
+    <rect x="155" y="241" width="200" height="46" rx="2" fill="url(#module-green)" />
+    <text x="255.0" y="270.0" font-size="22" fill="#242424" text-anchor="middle" data-contrast="on-pastel">CP composition</text>
+    <text x="255" y="312" font-size="20" fill="#242424" text-anchor="middle">Shared threshold 0.5 → OC ⊆ OD</text>
+    <g id="detail-vra" transform="translate(20 350)">
+      <rect x="0" y="0" width="470" height="380" fill="#FBFDFF" stroke="#AFCADB" stroke-width="1.2" stroke-dasharray="7 4" />
+      <text x="16" y="34" font-size="27" fill="#273440" font-family="Times New Roman, Times, serif" font-style="italic" font-weight="bold">Vertical region allocation (VRA)</text>
+      <text x="43" y="105" font-size="24" fill="#273440" font-family="Times New Roman, Times, serif" font-style="italic" font-weight="bold">F</text>
+      <g transform="translate(22 137)">
+        <polygon points="0,27 13,10 49,10 36,27" fill="#E2E5E7" stroke="#A2A9AF" stroke-width="1" />
+        <polygon points="0,22 13,5 49,5 36,22" fill="#E2E5E7" stroke="#A2A9AF" stroke-width="1" />
+        <polygon points="0,17 13,0 49,0 36,17" fill="#E2E5E7" stroke="#A2A9AF" stroke-width="1" />
+        <polygon points="0,12 13,-5 49,-5 36,12" fill="#E2E5E7" stroke="#A2A9AF" stroke-width="1" />
+        <polygon points="0,7 13,-10 49,-10 36,7" fill="#E2E5E7" stroke="#A2A9AF" stroke-width="1" />
+      </g>
+      <path d="M72 155H76" fill="none" stroke="#657B86" stroke-width="1.8" marker-end="url(#forward)" />
+      <rect x="80" y="121" width="88" height="62" fill="url(#module-blue)" stroke="#8CB2CC" rx="3" />
+      <text x="124.0" y="159.0" font-size="17" fill="#273440" text-anchor="middle" data-contrast="on-pastel">Pool+VRA</text>
+      <path d="M170 152H181" fill="none" stroke="#657B86" stroke-width="1.8" marker-end="url(#forward)" />
+      <rect x="186" y="80" width="22" height="33" fill="#6699EE" stroke="#536C82" stroke-width="0.7" />
+      <text x="217" y="103" font-size="18" fill="#273440">Out.</text>
+      <rect x="186" y="113" width="22" height="33" fill="#C4E4AC" stroke="#536C82" stroke-width="0.7" />
+      <text x="217" y="136" font-size="18" fill="#273440">Rim</text>
+      <rect x="186" y="146" width="22" height="33" fill="#F3A0AB" stroke="#536C82" stroke-width="0.7" />
+      <text x="217" y="169" font-size="18" fill="#273440">Cup</text>
+      <rect x="186" y="179" width="22" height="33" fill="#C4E4AC" stroke="#536C82" stroke-width="0.7" />
+      <text x="217" y="202" font-size="18" fill="#273440">Rim</text>
+      <rect x="186" y="212" width="22" height="33" fill="#6699EE" stroke="#536C82" stroke-width="0.7" />
+      <text x="217" y="235" font-size="18" fill="#273440">Out.</text>
+      <text x="317" y="107" font-size="19" fill="#273440" text-anchor="middle">Vertical</text>
+      <text x="317" y="129" font-size="19" fill="#273440" text-anchor="middle">cup prior</text>
+      <rect x="277" y="140" width="80" height="97" fill="url(#vertical-prior)" stroke="#50697E" stroke-width="1" />
+      <text x="423" y="107" font-size="17" fill="#273440" text-anchor="middle">Bounded logit</text>
+      <text x="430" y="129" font-size="18" fill="#273440" text-anchor="middle">correction</text>
+      <rect x="395" y="140" width="70" height="97" fill="url(#bounded-prior)" stroke="#50697E" stroke-width="1" />
+      <path d="M360 187H391" fill="none" stroke="#657B86" stroke-width="1.8" marker-end="url(#forward)" />
+      <path d="M198 248V278H318V240" fill="none" stroke="#657B86" stroke-width="1.8" marker-end="url(#forward)" />
+      <path d="M198 280V331" fill="none" stroke="#C87855" stroke-width="1.8" marker-end="url(#supervision)" stroke-dasharray="6 4" />
+      <text x="22" y="335" font-size="18" fill="#273440">GT region</text>
+      <text x="22" y="358" font-size="18" fill="#273440">lengths</text>
+      <path d="M101 346H163" fill="none" stroke="#C87855" stroke-width="1.8" marker-end="url(#supervision)" stroke-dasharray="6 4" />
+      <rect x="168" y="332" width="90" height="34" fill="#FFF9F4" stroke="#C87855" stroke-dasharray="6 4" stroke-width="1" />
+      <text x="213" y="356" font-size="23" fill="#273440" font-family="Times New Roman, Times, serif" font-style="italic" text-anchor="middle" font-weight="bold" data-contrast="on-pastel"><tspan>L</tspan><tspan baseline-shift="sub" font-size="70%">VRA</tspan></text>
+      <text x="286" y="350" font-size="23" fill="#273440" font-family="Times New Roman, Times, serif" font-style="italic" font-weight="bold"><tspan>Z</tspan><tspan baseline-shift="sub" font-size="70%">C</tspan></text>
+      <path d="M320 343H405" fill="none" stroke="#657B86" stroke-width="1.8" marker-end="url(#forward)" />
+      <g transform="translate(410 321) scale(1.0)">
+        <rect x="0" y="0" width="8" height="43" fill="#D7E8F4" stroke="none" />
+        <rect x="9" y="0" width="8" height="43" fill="#BCD8EB" stroke="none" />
+        <rect x="18" y="0" width="8" height="43" fill="#88B9D7" stroke="none" />
+        <rect x="27" y="0" width="8" height="43" fill="#5699C2" stroke="none" />
+        <rect x="36" y="0" width="8" height="43" fill="#BDD8E9" stroke="none" />
+      </g>
+      <path d="M431 317V241" fill="none" stroke="#657B86" stroke-width="1.8" marker-end="url(#forward)" />
+    </g>
+    <g id="detail-cp" transform="translate(12 754)">
+      <rect x="0" y="0" width="486" height="380" fill="#FCFEFD" stroke="#ADCDBC" stroke-width="1.2" stroke-dasharray="7 4" />
+      <text x="16" y="34" font-size="27" fill="#273440" font-family="Times New Roman, Times, serif" font-style="italic" font-weight="bold">Cup-preserving composition (CP)</text>
+      <text x="49" y="83" font-size="25" fill="#273440" font-family="Times New Roman, Times, serif" font-style="italic" text-anchor="middle" font-weight="bold"><tspan>Z</tspan><tspan baseline-shift="sub" font-size="70%">C</tspan></text>
+      <g transform="translate(26 98) scale(0.7833333333333333)">
+        <rect x="0" y="0" width="60" height="60" fill="#000000" stroke="#000000" rx="2" />
+        <ellipse cx="30" cy="30" rx="13" ry="18" fill="url(#cup-probability)" />
+      </g>
+      <path d="M77 122H111" fill="none" stroke="#657B86" stroke-width="1.8" marker-end="url(#forward)" />
+      <circle cx="128" cy="122" r="14" fill="#D9ECE2" stroke="#79A992" stroke-width="1.2" />
+      <path d="M120 122H136M128 114V130" fill="none" stroke="#659880" stroke-width="1.4" />
+      <path d="M145 122H162" fill="none" stroke="#657B86" stroke-width="1.8" marker-end="url(#forward)" />
+      <path d="M165 104v35h48" fill="none" stroke="#A7C9BC" stroke-width="1" />
+      <path d="M168 137C189 137 189 107 209 107" fill="none" stroke="#539780" stroke-width="2.3" />
+      <path d="M214 122H225" fill="none" stroke="#657B86" stroke-width="1.8" marker-end="url(#forward)" />
+      <g transform="translate(230 98) scale(0.7833333333333333)">
+        <rect x="0" y="0" width="60" height="60" fill="#000000" stroke="#000000" rx="2" />
+        <ellipse cx="30" cy="30" rx="13" ry="18" fill="url(#cup-probability)" />
+      </g>
+      <text x="253" y="83" font-size="25" fill="#273440" font-family="Times New Roman, Times, serif" font-style="italic" text-anchor="middle" font-weight="bold"><tspan>P</tspan><tspan baseline-shift="sub" font-size="70%">C</tspan></text>
+      <text x="304" y="93" font-size="24" fill="#273440" font-family="Times New Roman, Times, serif" font-style="italic" text-anchor="middle" font-weight="bold">SG</text>
+      <path d="M280 122H306V191H329" fill="none" stroke="#657B86" stroke-width="1.8" marker-end="url(#forward)" />
+      <path d="M18 187H128V139" fill="none" stroke="#657B86" stroke-width="1.8" marker-end="url(#forward)" />
+      <text x="31" y="175" font-size="23" fill="#273440" font-family="Times New Roman, Times, serif" font-style="italic" font-weight="bold">B</text>
+      <text x="49" y="222" font-size="25" fill="#273440" font-family="Times New Roman, Times, serif" font-style="italic" text-anchor="middle" font-weight="bold"><tspan>Z</tspan><tspan baseline-shift="sub" font-size="70%">R</tspan></text>
+      <g transform="translate(26 235) scale(0.7833333333333333)">
+        <rect x="0" y="0" width="60" height="60" fill="#000000" stroke="#000000" rx="2" />
+        <ellipse cx="30" cy="30" rx="24" ry="26" fill="url(#disc-probability)" />
+        <ellipse cx="30" cy="30" rx="12" ry="17" fill="#000000" />
+      </g>
+      <path d="M77 259H114" fill="none" stroke="#657B86" stroke-width="1.8" marker-end="url(#forward)" />
+      <path d="M117 241v35h48" fill="none" stroke="#A7C9BC" stroke-width="1" />
+      <path d="M120 274C141 274 141 244 161 244" fill="none" stroke="#539780" stroke-width="2.3" />
+      <path d="M169 259H224" fill="none" stroke="#657B86" stroke-width="1.8" marker-end="url(#forward)" />
+      <g transform="translate(230 235) scale(0.7833333333333333)">
+        <rect x="0" y="0" width="60" height="60" fill="#000000" stroke="#000000" rx="2" />
+        <ellipse cx="30" cy="30" rx="24" ry="26" fill="url(#disc-probability)" />
+        <ellipse cx="30" cy="30" rx="12" ry="17" fill="#000000" />
+      </g>
+      <text x="253" y="207" font-size="18" fill="#273440" text-anchor="middle">Conditional</text>
+      <text x="253" y="227" font-size="20" fill="#273440" font-family="Times New Roman, Times, serif" font-style="italic" text-anchor="middle"><tspan>rim </tspan><tspan>P</tspan><tspan baseline-shift="sub" font-size="70%">R</tspan></text>
+      <path d="M280 259H309V224H326" fill="none" stroke="#657B86" stroke-width="1.8" marker-end="url(#forward)" />
+      <g transform="translate(326 168) scale(1.15)">
+        <ellipse cx="30" cy="32" rx="27" ry="31" fill="#D9EBE1" stroke="#80B49D" stroke-width="1.5" />
+        <ellipse cx="30" cy="32" rx="21" ry="25" fill="#A5CFBA" />
+        <ellipse cx="30" cy="32" rx="12" ry="17" fill="#528C77" />
+      </g>
+      <path d="M397 205H423" fill="none" stroke="#657B86" stroke-width="1.8" marker-end="url(#forward)" />
+      <g transform="translate(428 182) scale(0.7333333333333333)">
+        <rect x="0" y="0" width="60" height="60" fill="#000000" stroke="#000000" rx="2" />
+        <ellipse cx="30" cy="30" rx="24" ry="26" fill="url(#disc-probability)" />
+      </g>
+      <text x="450" y="169" font-size="24" fill="#273440" font-family="Times New Roman, Times, serif" font-style="italic" text-anchor="middle" font-weight="bold"><tspan>P</tspan><tspan baseline-shift="sub" font-size="70%">D</tspan></text>
+      <text x="318" y="316" font-size="21" fill="#273440" font-family="Times New Roman, Times, serif" font-style="italic" text-anchor="middle" font-weight="bold"><tspan>P</tspan><tspan baseline-shift="sub" font-size="70%">D</tspan><tspan> = </tspan><tspan>P</tspan><tspan baseline-shift="sub" font-size="70%">C</tspan><tspan> + (1 − </tspan><tspan>P</tspan><tspan baseline-shift="sub" font-size="70%">C</tspan><tspan>) ⊙ </tspan><tspan>P</tspan><tspan baseline-shift="sub" font-size="70%">R</tspan></text>
+      <path d="M15 331H471" fill="none" stroke="#A5CDB8" stroke-width="1.4" />
+      <text x="97" y="357" font-size="18" fill="#273440" text-anchor="middle">GT masks</text>
+      <path d="M145 350H211" fill="none" stroke="#C87855" stroke-width="1.8" marker-end="url(#supervision)" stroke-dasharray="6 4" />
+      <rect x="216" y="334" width="96" height="34" fill="#FFF9F4" stroke="#C87855" stroke-dasharray="6 4" stroke-width="1" />
+      <text x="264" y="358" font-size="22" fill="#273440" font-family="Times New Roman, Times, serif" font-style="italic" text-anchor="middle" font-weight="bold" data-contrast="on-pastel"><tspan>L</tspan><tspan baseline-shift="sub" font-size="70%">seg</tspan></text>
+      <path d="M367 350H318" fill="none" stroke="#C87855" stroke-width="1.8" marker-end="url(#supervision)" stroke-dasharray="6 4" />
+      <text x="421" y="357" font-size="20" fill="#273440" font-family="Times New Roman, Times, serif" font-style="italic" text-anchor="middle" font-weight="bold"><tspan>P</tspan><tspan baseline-shift="sub" font-size="70%">C</tspan><tspan>, </tspan><tspan>P</tspan><tspan baseline-shift="sub" font-size="70%">D</tspan><tspan baseline-shift="super" font-size="70%">tr</tspan></text>
+    </g>
+    <g id="detail-ratio" transform="translate(13 1158)">
+      <rect x="0" y="0" width="484" height="380" fill="#FDFCFF" stroke="#C7B2DB" stroke-width="1.2" stroke-dasharray="7 4" />
+      <text x="16" y="34" font-size="27" fill="#273440" font-family="Times New Roman, Times, serif" font-style="italic" font-weight="bold">Soft-vCDR supervision</text>
+      <text x="375" y="84" font-size="20" fill="#273440" font-family="Times New Roman, Times, serif" font-style="italic" text-anchor="middle">Training only</text>
+      <text x="29" y="101" font-size="24" fill="#273440" font-family="Times New Roman, Times, serif" font-style="italic" font-weight="bold"><tspan>P</tspan><tspan baseline-shift="sub" font-size="70%">C</tspan></text>
+      <g transform="translate(27 113) scale(0.7333333333333333)">
+        <rect x="0" y="0" width="60" height="60" fill="#000000" stroke="#000000" rx="2" />
+        <ellipse cx="30" cy="30" rx="13" ry="18" fill="url(#cup-probability)" />
+      </g>
+      <path d="M75 135H117" fill="none" stroke="#657B86" stroke-width="1.8" marker-end="url(#forward)" />
+      <path d="M124 108v63" fill="none" stroke="#B99AD2" stroke-width="1.3" />
+      <rect x="127" y="111" width="8.695652173913043" height="4" fill="#B294CE" stroke="none" />
+      <rect x="127" y="118" width="19.565217391304348" height="4" fill="#B294CE" stroke="none" />
+      <rect x="127" y="125" width="33.69565217391305" height="4" fill="#B294CE" stroke="none" />
+      <rect x="127" y="132" width="50.0" height="4" fill="#B294CE" stroke="none" />
+      <rect x="127" y="139" width="40.21739130434783" height="4" fill="#B294CE" stroke="none" />
+      <rect x="127" y="146" width="26.08695652173913" height="4" fill="#B294CE" stroke="none" />
+      <rect x="127" y="153" width="13.043478260869565" height="4" fill="#B294CE" stroke="none" />
+      <rect x="127" y="160" width="5.434782608695652" height="4" fill="#B294CE" stroke="none" />
+      <text x="27" y="200" font-size="24" fill="#273440" font-family="Times New Roman, Times, serif" font-style="italic" font-weight="bold"><tspan>P</tspan><tspan baseline-shift="sub" font-size="70%">D</tspan><tspan baseline-shift="super" font-size="70%">tr</tspan></text>
+      <g transform="translate(27 212) scale(0.7333333333333333)">
+        <rect x="0" y="0" width="60" height="60" fill="#000000" stroke="#000000" rx="2" />
+        <ellipse cx="30" cy="30" rx="24" ry="26" fill="url(#disc-probability)" />
+      </g>
+      <path d="M75 234H117" fill="none" stroke="#657B86" stroke-width="1.8" marker-end="url(#forward)" />
+      <path d="M124 208v63" fill="none" stroke="#B99AD2" stroke-width="1.3" />
+      <rect x="127" y="211" width="8.695652173913043" height="4" fill="#B294CE" stroke="none" />
+      <rect x="127" y="218" width="19.565217391304348" height="4" fill="#B294CE" stroke="none" />
+      <rect x="127" y="225" width="33.69565217391305" height="4" fill="#B294CE" stroke="none" />
+      <rect x="127" y="232" width="50.0" height="4" fill="#B294CE" stroke="none" />
+      <rect x="127" y="239" width="40.21739130434783" height="4" fill="#B294CE" stroke="none" />
+      <rect x="127" y="246" width="26.08695652173913" height="4" fill="#B294CE" stroke="none" />
+      <rect x="127" y="253" width="13.043478260869565" height="4" fill="#B294CE" stroke="none" />
+      <rect x="127" y="260" width="5.434782608695652" height="4" fill="#B294CE" stroke="none" />
+      <path d="M179 139H248V177H284" fill="none" stroke="#657B86" stroke-width="1.8" marker-end="url(#forward)" />
+      <path d="M179 240H248V214H284" fill="none" stroke="#657B86" stroke-width="1.8" marker-end="url(#forward)" />
+      <circle cx="312" cy="195" r="23" fill="#E8DDF1" stroke="#A881C1" stroke-width="1.3" />
+      <text x="312" y="204" font-size="31" fill="#8E60AC" text-anchor="middle">÷</text>
+      <text x="331" y="164" font-size="24" fill="#273440" font-family="Times New Roman, Times, serif" font-style="italic" font-weight="bold"><tspan>r</tspan><tspan baseline-shift="sub" font-size="70%">soft</tspan></text>
+      <path d="M338 195H381" fill="none" stroke="#C87855" stroke-width="1.8" marker-end="url(#supervision)" stroke-dasharray="6 4" />
+      <rect x="387" y="168" width="82" height="64" fill="#FFF9F4" stroke="#C87855" stroke-dasharray="6 4" stroke-width="1" />
+      <text x="428" y="195" font-size="19" fill="#273440" text-anchor="middle" data-contrast="on-pastel">Smooth</text>
+      <text x="428" y="218" font-size="19" fill="#273440" text-anchor="middle" data-contrast="on-pastel">L1</text>
+      <text x="26" y="296" font-size="20" fill="#273440">Source GT masks</text>
+      <g transform="translate(27 311) scale(0.65)">
+        <rect x="0" y="0" width="60" height="60" fill="#000000" stroke="#000000" rx="2" />
+        <ellipse cx="30" cy="30" rx="23" ry="26" fill="#CBD4D9" />
+        <ellipse cx="30" cy="30" rx="12" ry="17" fill="#FFFFFF" />
+      </g>
+      <path d="M70 331H117" fill="none" stroke="#657B86" stroke-width="1.8" marker-end="url(#forward)" />
+      <path d="M124 301v63" fill="none" stroke="#B99AD2" stroke-width="1.3" />
+      <rect x="127" y="304" width="8.695652173913043" height="4" fill="#B294CE" stroke="none" />
+      <rect x="127" y="311" width="19.565217391304348" height="4" fill="#B294CE" stroke="none" />
+      <rect x="127" y="318" width="33.69565217391305" height="4" fill="#B294CE" stroke="none" />
+      <rect x="127" y="325" width="50.0" height="4" fill="#B294CE" stroke="none" />
+      <rect x="127" y="332" width="40.21739130434783" height="4" fill="#B294CE" stroke="none" />
+      <rect x="127" y="339" width="26.08695652173913" height="4" fill="#B294CE" stroke="none" />
+      <rect x="127" y="346" width="13.043478260869565" height="4" fill="#B294CE" stroke="none" />
+      <rect x="127" y="353" width="5.434782608695652" height="4" fill="#B294CE" stroke="none" />
+      <path d="M179 331H289" fill="none" stroke="#657B86" stroke-width="1.8" marker-end="url(#forward)" />
+      <text x="316" y="340" font-size="26" fill="#273440" font-family="Times New Roman, Times, serif" font-style="italic" font-weight="bold">r*</text>
+      <path d="M340 331H428V237" fill="none" stroke="#C87855" stroke-width="1.8" marker-end="url(#supervision)" stroke-dasharray="6 4" />
+    </g>
+    <text x="255" y="1575" font-size="19" fill="#868B92" text-anchor="middle">Source training · frozen target inference</text>
   </g>
 </svg>

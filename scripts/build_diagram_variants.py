@@ -1,4 +1,4 @@
-"""Build compact README SVG portraits and dark themes from editable masters.
+"""Build paper-style README SVG portraits and dark themes from editable masters.
 
 Standard library only; no datasets, model dependencies, or raster conversion.
 Run after editing assets/cupgeo-method.svg or assets/cupgeo-protocol.svg.
@@ -13,7 +13,7 @@ import xml.etree.ElementTree as ET
 ROOT = Path(__file__).resolve().parents[1]
 NS = "http://www.w3.org/2000/svg"
 ET.register_namespace("", NS)
-FONT = "Arial, Helvetica, sans-serif"
+FONT = "Times New Roman, Times, serif"
 
 
 def element(parent, tag, attrs=None, text=None):
@@ -42,18 +42,23 @@ def group_by_id(root, name):
     raise ValueError(f"Missing required SVG element: {name}")
 
 
-def canvas(source, height, title):
-    root = ET.Element(f"{{{NS}}}svg", {"width": "480", "height": str(height),
-        "viewBox": f"0 0 480 {height}", "role": "img", "aria-labelledby": "title desc"})
+def canvas(source, height, title, width=480):
+    root = ET.Element(f"{{{NS}}}svg", {"width": str(width), "height": str(height),
+        "viewBox": f"0 0 {width} {height}", "role": "img", "aria-labelledby": "title desc"})
     element(root, "title", {"id": "title"}, title)
     element(root, "desc", {"id": "desc"}, source.find(f"{{{NS}}}desc").text)
-    root.append(copy.deepcopy(source.find(f"{{{NS}}}defs")))
-    element(root, "rect", {"width": 480, "height": height, "fill": "#FFFFFF", "id": "canvas"})
+    definitions = copy.deepcopy(source.find(f"{{{NS}}}defs"))
+    if not any(node.get("id") == "arrow" for node in definitions.iter()):
+        marker = copy.deepcopy(group_by_id(source, "forward"))
+        marker.set("id", "arrow")
+        definitions.append(marker)
+    root.append(definitions)
+    element(root, "rect", {"width": width, "height": height, "fill": "#FFFFFF", "id": "canvas"})
     return root, element(root, "g", {"font-family": FONT})
 
 
 def block(parent, x, y, w, h, lines, fill="#FBE4D5", size=19):
-    element(parent, "rect", {"x": x, "y": y, "width": w, "height": h, "rx": 9, "fill": fill})
+    element(parent, "rect", {"x": x, "y": y, "width": w, "height": h, "rx": 2, "fill": fill})
     for i, line in enumerate(lines):
         label(parent, x+w/2, y+h/2+(i-(len(lines)-1)/2)*24+6, line, size,
               **{"text-anchor": "middle", "data-contrast": "on-pastel"})
@@ -75,49 +80,28 @@ def stage(parent, y, text):
 
 
 def method_portrait(source):
-    root, g = canvas(source, 850, "CuPGeo — compact architecture, portrait layout")
-    label(g, 24, 36, "CuPGeo", 25, **{"font-weight": 600})
-    label(g, 456, 34, "Source-only segmentation", 16, "#868B92", **{"text-anchor": "end"})
-    stage(g, 76, "Representation")
-    block(g, 24, 98, 202, 60, ["DINOv3-L/16"], "#DFECF8")
-    block(g, 245, 98, 74, 60, ["LoRA"], size=17)
-    block(g, 338, 98, 118, 60, ["Pyramid-FPN"], size=16)
-    arrow(g, "M228 128H241")
-    arrow(g, "M321 128H334")
-    arrow(g, "M397 161V189H124V222")
-    arrow(g, "M358 189V222")
-    block(g, 30, 226, 184, 58, ["Segmentation head"], size=18)
-    block(g, 266, 226, 184, 58, ["VRA"], size=20)
-    arrow(g, "M217 253H262")
-    label(g, 239, 243, "Z꜀", 16, "#B14A44", **{"text-anchor": "middle"})
-    arrow(g, "M124 288V368H141")
-    arrow(g, "M358 288V368H339")
-    label(g, 116, 326, "Z꜀", 18, "#B14A44", **{"text-anchor": "end"})
-    label(g, 371, 326, "B", 18, "#B14A44")
-    block(g, 145, 338, 190, 60, ["Cup refine", "σ(Z꜀ + B)"], "#E2EFD9")
-    arrow(g, "M240 402V448")
-    label(g, 252, 428, "P꜀", 18, "#B14A44")
-    arrow(g, "M27 254H16V490H141")
-    label(g, 29, 425, "Zᵣ", 18, "#B14A44")
-    block(g, 145, 452, 190, 76, ["CP composition", "SG on disc path"], "#E2EFD9", 18)
-    arrow(g, "M240 532V562")
-    block(g, 67, 566, 346, 60, ["Threshold 0.5 → OC ⊆ OD"], "#E2EFD9", 20)
-    arrow(g, "M243 548H440V676", training=True)
-    label(g, 24, 661, "Training only", 16, "#868B92", **{"font-style": "italic"})
-    block(g, 24, 680, 192, 56, ["Source-mask", "moments"], "#E2EFD9", 18)
-    block(g, 250, 680, 206, 56, ["Soft-vCDR", "Smooth L1 · λ = 2"], "#E2EFD9", 18)
-    arrow(g, "M219 708H246", training=True)
-    # Reuse the exact composition from the master, including math subscripts.
-    equation = copy.deepcopy(list(group_by_id(source, "method-legend"))[-1])
-    equation.set("x", "240")
-    equation.set("y", "776")
-    equation.set("font-size", "21")
-    equation.set("text-anchor", "middle")
-    g.append(equation)
-    element(g, "rect", {"x": 16, "y": 797, "width": 448, "height": 37, "rx": 6, "fill": "#F5F5F5"})
-    for x, color, name in ((29, "#DFECF8", "frozen"), (164, "#FBE4D5", "trainable"), (320, "#E2EFD9", "geometry")):
-        element(g, "rect", {"x": x, "y": 806, "width": 20, "height": 19, "rx": 3, "fill": color})
-        label(g, x+28, 821, name, 16)
+    root, g = canvas(source, 1598, "CuPGeo — architecture and module details, portrait layout", width=510)
+    label(g, 20, 35, "CuPGeo", 29, **{"font-weight": 700, "font-style": "italic"})
+    label(g, 490, 33, "Architecture & geometric supervision", 16, "#868B92", **{"text-anchor": "end"})
+    element(g, "rect", {"x": 20, "y": 55, "width": 470, "height": 273, "fill": "#FBFDFF",
+                        "stroke": "#AFCADB", "stroke-dasharray": "6 4"})
+    block(g, 37, 75, 436, 46, ["DINOv3-L/16 + LoRA → Pyramid-FPN"], "url(#module-blue)", 20)
+    # The compact overview uses the same inputs to segmentation, VRA and CP.
+    arrow(g, "M132 124V158")
+    arrow(g, "M377 124V158")
+    block(g, 37, 162, 194, 46, ["Segmentation head"], "url(#module-blue)", 20)
+    block(g, 279, 162, 194, 46, ["VRA"], "url(#module-blue)", 21)
+    arrow(g, "M234 185H275")
+    label(g, 255, 176, "Z꜀", 17, **{"text-anchor": "middle"})
+    arrow(g, "M132 211V264H150")
+    arrow(g, "M377 211V264H359")
+    block(g, 155, 241, 200, 46, ["CP composition"], "url(#module-green)", 22)
+    label(g, 255, 312, "Shared threshold 0.5 → OC ⊆ OD", 20, **{"text-anchor": "middle"})
+    for name, x, y in (("detail-vra", 20, 350), ("detail-cp", 12, 754), ("detail-ratio", 13, 1158)):
+        panel = copy.deepcopy(group_by_id(source, name))
+        panel.set("transform", f"translate({x} {y})")
+        g.append(panel)
+    label(g, 255, 1575, "Source training · frozen target inference", 19, "#868B92", **{"text-anchor": "middle"})
     return root
 
 
@@ -137,24 +121,24 @@ def protocol_portrait(source):
     stage(g, 78, "Source training")
     training_count = group_by_id(source, "source-train-count").text
     validation_count = group_by_id(source, "source-validation-count").text
-    block(g, 24, 98, 196, 66, ["REFUGE", f"{training_count} training images"], "#DFECF8", 19)
-    block(g, 252, 98, 204, 66, ["CP pretraining", pretraining], size=19)
+    block(g, 24, 98, 196, 66, ["REFUGE", f"{training_count} training images"], "url(#protocol-source-fill)", 19)
+    block(g, 252, 98, 204, 66, ["CP pretraining", pretraining], "url(#protocol-pretrain-fill)", 19)
     arrow(g, "M223 131H248")
     arrow(g, "M354 168V203H50V449")
     label(g, 240, 194, "Same-seed source-selected CP best", 16, "#868B92", **{"text-anchor": "middle"})
     for i, name in enumerate(branches):
         y = 229+i*50
-        element(g, "rect", {"x": 85, "y": y, "width": 371, "height": 39, "rx": 7, "fill": "#FBE4D5"})
+        element(g, "rect", {"x": 85, "y": y, "width": 371, "height": 39, "rx": 2, "fill": "url(#protocol-branch-fill)"})
         label(g, 101, y+26, name, 18, **{"data-contrast": "on-pastel", "font-weight": 600 if name == "Full CuPGeo" else 400})
         label(g, 440, y+25, continuation, 16, **{"text-anchor": "end", "data-contrast": "on-pastel"})
         arrow(g, f"M50 {y+20}H81")
     label(g, 240, 496, "Five independent continuations", 16, "#868B92", **{"text-anchor": "middle"})
     stage(g, 539, "Source-only selection")
-    block(g, 24, 558, 432, 78, [f"REFUGE · {validation_count} validation images", "Best source-validation Mean Dice"], "#DFECF8", 20)
+    block(g, 24, 558, 432, 78, [f"REFUGE · {validation_count} validation images", "Best source-validation Mean Dice"], "url(#protocol-source-fill)", 20)
     stage(g, 681, "Frozen evaluation")
     for i, (name, count) in enumerate(zip(names, counts)):
         y = 701+i*43
-        element(g, "rect", {"x": 24, "y": y, "width": 432, "height": 33, "rx": 6, "fill": "#E2EFD9"})
+        element(g, "rect", {"x": 24, "y": y, "width": 432, "height": 33, "rx": 2, "fill": "url(#protocol-target-fill)"})
         label(g, 40, y+23, name, 18, **{"data-contrast": "on-pastel"})
         label(g, 440, y+23, f"{count} images", 16, **{"text-anchor": "end", "data-contrast": "on-pastel"})
     label(g, 240, 893, "Targets used for evaluation only", 16, "#868B92", **{"text-anchor": "middle"})
@@ -167,16 +151,27 @@ def protocol_portrait(source):
 
 def dark_variant(source):
     root = copy.deepcopy(source)
-    palette = {"#FFFFFF": "#171A1F", "#F5F5F5": "#24282F", "#242424": "#E3E6EA",
-               "#868B92": "#A7AFBA", "#C6CACF": "#59616C", "#D5D8DC": "#47505B",
-               "#B14A44": "#EDA092"}
+    palette = {
+        "#F5F5F5": "#242A32", "#FAFBFC": "#242A32", "#242424": "#E3E6EA", "#273440": "#E3E6EA",
+        "#868B92": "#AFB9C4", "#536970": "#AFB9C4", "#C6CACF": "#596773",
+        "#D5D8DC": "#47505B", "#B14A44": "#EDA092", "#647983": "#A1B3BF",
+        "#657B86": "#A1B3BF", "#6C7D89": "#A1B3BF", "#C9D3DA": "#506171",
+        "#FBFDFF": "#192630", "#FCFEFD": "#1C2B25", "#FDFCFF": "#282231",
+        "#AFCADB": "#557186", "#ADCDBC": "#547966", "#C7B2DB": "#79618E",
+        "#A4BED0": "#557186", "#A4C7B5": "#547966", "#C0AED3": "#79618E",
+        "#C87855": "#DB9978",
+    }
     for node in root.iter():
+        # Keep scientific white probabilities white; recolor only canvas surfaces.
+        if node.get("id") in {"canvas", "overview-surface"}:
+            node.set("fill", "#141C24")
+        elif node.tag.endswith("rect") and node.get("width") == "1600" and node.get("height") == "430":
+            node.set("fill", "#141C24")
         for attr in ("fill", "stroke"):
             if node.get(attr) in palette:
                 node.set(attr, palette[node.get(attr)])
         if node.get("data-contrast") == "on-pastel":
-            # Some labels inherit their fill from the source group.
-            node.set("fill", "#242424")
+            node.set("fill", "#273440")
     return root
 
 

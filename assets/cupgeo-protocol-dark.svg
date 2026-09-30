@@ -2,89 +2,108 @@
   <title id="title">CuPGeo — matched training and source-only model selection</title>
   <desc id="desc">REFUGE supplies 320 training images and 80 source-validation images. For each of seeds 0, 1, and 2, CP is pretrained for 120 epochs. Its best source-validation checkpoint independently initializes five 120-epoch continuations: CP only, Full CuPGeo, without ratio, without VRA, and without stop-gradient. Source-validation Mean Dice selects checkpoints. Frozen models are evaluated on BinRushed, 39 images; Magrabia, 19; RIM-ONE DL, 174; and PAPILA, 84. Target data do not participate in training or model selection. Results are averaged equally across the four domains within each seed, then summarized as the mean and sample standard deviation across seeds.</desc>
   <defs>
+    <linearGradient id="protocol-source-fill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#EFF6FD" />
+      <stop offset="1" stop-color="#CBDFF1" />
+    </linearGradient>
+    <linearGradient id="protocol-pretrain-fill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFF7DB" />
+      <stop offset="1" stop-color="#EACF8C" />
+    </linearGradient>
+    <linearGradient id="protocol-branch-fill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#EDF6F0" />
+      <stop offset="1" stop-color="#C5E0D0" />
+    </linearGradient>
+    <linearGradient id="protocol-target-fill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F6F1FB" />
+      <stop offset="1" stop-color="#E0D2EF" />
+    </linearGradient>
     <marker id="arrow" viewBox="0 0 10 10" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto">
-      <path d="M1 1L9 5L1 9Z" fill="#E3E6EA" />
+      <path d="M1 1L9 5L1 9Z" fill="#A1B3BF" />
     </marker>
     <marker id="stage-arrow" viewBox="0 0 10 10" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto">
-      <path d="M2 1L8 5L2 9" fill="none" stroke="#59616C" stroke-width="1.5" />
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#596773" stroke-width="1.5" />
     </marker>
   </defs>
-  <rect width="1600" height="430" fill="#171A1F" />
-  <g font-family="Arial, Helvetica, sans-serif" fill="#E3E6EA">
-    <g id="protocol-heading" fill="#A7AFBA" font-size="18" text-anchor="middle">
-      <g fill="none" stroke="#59616C" stroke-width="1.5">
-        <path d="M24 23V41M24 32H54M150 32H180M180 23V41" />
-        <path d="M222 23V41M222 32H388M593 32H763" marker-end="url(#stage-arrow)" />
-        <path d="M763 23V41M836 23V41M836 32H884M1071 32H1118" marker-end="url(#stage-arrow)" />
-        <path d="M1118 23V41M1210 23V41M1210 32H1290M1500 32H1576" marker-end="url(#stage-arrow)" />
-        <path d="M1576 23V41" />
+  <rect width="1600" height="430" fill="#141C24" />
+  <g font-family="Times New Roman, Times, Liberation Serif, serif" fill="#E3E6EA">
+    <g id="protocol-heading" font-size="24" font-weight="700" font-style="italic" text-anchor="middle">
+      <g stroke-width="1.1" stroke-dasharray="6 5">
+        <rect x="14" y="14" width="184" height="339" fill="#192630" stroke="#557186" />
+        <rect x="209" y="14" width="605" height="339" fill="#1C2B25" stroke="#547966" />
+        <rect x="825" y="14" width="322" height="339" fill="#192630" stroke="#557186" />
+        <rect x="1198" y="14" width="390" height="339" fill="#282231" stroke="#79618E" />
       </g>
-      <text x="102" y="38">Source</text>
-      <text x="490" y="38">Matched training</text>
-      <text x="977" y="38">Model selection</text>
-      <text x="1394" y="38">Frozen evaluation</text>
-      <text id="total-budget" x="490" y="62" font-size="14">240 EPOCHS</text>
+      <text x="102" y="43">Source</text>
+      <text x="490" y="43">Matched training</text>
+      <text x="977" y="43">Model selection</text>
+      <text x="1394" y="43">Frozen evaluation</text>
+      <text id="total-budget" x="490" y="66" font-size="14" font-style="normal" font-weight="400" fill="#A1B3BF">240 EPOCHS</text>
     </g>
     <g id="protocol-source" text-anchor="middle">
-      <rect x="24" y="147" width="156" height="108" rx="11" fill="#DFECF8" />
-      <text x="102" y="178" font-size="21" data-contrast="on-pastel" fill="#242424">REFUGE</text>
-      <text id="source-train-count" x="102" y="207" font-size="24" data-contrast="on-pastel" fill="#242424">320</text>
-      <text x="102" y="235" font-size="17" data-contrast="on-pastel" fill="#242424">training images</text>
+      <rect x="24" y="147" width="156" height="108" rx="2" fill="url(#protocol-source-fill)" stroke="#86A6BF" stroke-width="1.1" />
+      <text x="102" y="178" font-size="21" data-contrast="on-pastel" fill="#273440">REFUGE</text>
+      <text id="source-train-count" x="102" y="207" font-size="24" data-contrast="on-pastel" fill="#273440">320</text>
+      <text x="102" y="235" font-size="17" data-contrast="on-pastel" fill="#273440">training images</text>
     </g>
     <g id="protocol-training">
       <g id="protocol-pretraining" text-anchor="middle">
-        <rect x="222" y="147" width="200" height="108" rx="11" fill="#FBE4D5" />
-        <text x="322" y="179" font-size="22" data-contrast="on-pastel" fill="#242424">CP pretraining</text>
-        <text id="pretraining-budget" x="322" y="213" font-size="20" data-contrast="on-pastel" fill="#242424">120 epochs</text>
-        <text x="322" y="239" font-size="16" fill="#242424" data-contrast="on-pastel">one checkpoint / seed</text>
-        <text x="322" y="286" font-size="16" fill="#A7AFBA">Source-selected CP best</text>
+        <rect x="222" y="147" width="200" height="108" rx="2" fill="url(#protocol-pretrain-fill)" stroke="#B99E5F" stroke-width="1.1" />
+        <text x="322" y="179" font-size="22" data-contrast="on-pastel" fill="#273440">CP pretraining</text>
+        <text id="pretraining-budget" x="322" y="213" font-size="20" data-contrast="on-pastel" fill="#273440">120 epochs</text>
+        <text x="322" y="239" font-size="16" fill="#273440" data-contrast="on-pastel">one checkpoint / seed</text>
+        <text x="322" y="286" font-size="16" fill="#AFB9C4">Source-selected CP best</text>
       </g>
       <g id="protocol-continuations">
-        <rect x="478" y="89" width="285" height="38" rx="8" fill="#FBE4D5" />
-        <rect x="478" y="135" width="285" height="38" rx="8" fill="#FBE4D5" />
-        <rect x="478" y="181" width="285" height="38" rx="8" fill="#FBE4D5" />
-        <rect x="478" y="227" width="285" height="38" rx="8" fill="#FBE4D5" />
-        <rect x="478" y="273" width="285" height="38" rx="8" fill="#FBE4D5" />
-        <g id="branch-labels" font-size="19" text-anchor="middle">
-          <text x="620.5" y="115" data-contrast="on-pastel" fill="#242424">CP only</text>
-          <text x="620.5" y="161" font-weight="700" data-contrast="on-pastel" fill="#242424">Full CuPGeo</text>
-          <text x="620.5" y="207" data-contrast="on-pastel" fill="#242424">w/o ratio</text>
-          <text x="620.5" y="253" data-contrast="on-pastel" fill="#242424">w/o VRA</text>
-          <text x="620.5" y="299" data-contrast="on-pastel" fill="#242424">w/o SG</text>
+        <g fill="url(#protocol-branch-fill)" stroke="#86AE9B" stroke-width="1.1">
+          <rect x="478" y="89" width="285" height="38" rx="2" />
+          <rect x="478" y="135" width="285" height="38" rx="2" />
+          <rect x="478" y="181" width="285" height="38" rx="2" />
+          <rect x="478" y="227" width="285" height="38" rx="2" />
+          <rect x="478" y="273" width="285" height="38" rx="2" />
         </g>
-        <text id="continuation-budget" x="620.5" y="337" font-size="17" text-anchor="middle" fill="#A7AFBA">+120 epochs each</text>
+        <g id="branch-labels" font-size="19" text-anchor="middle">
+          <text x="620.5" y="115" data-contrast="on-pastel" fill="#273440">CP only</text>
+          <text x="620.5" y="161" font-weight="700" data-contrast="on-pastel" fill="#273440">Full CuPGeo</text>
+          <text x="620.5" y="207" data-contrast="on-pastel" fill="#273440">w/o ratio</text>
+          <text x="620.5" y="253" data-contrast="on-pastel" fill="#273440">w/o VRA</text>
+          <text x="620.5" y="299" data-contrast="on-pastel" fill="#273440">w/o SG</text>
+        </g>
+        <text id="continuation-budget" x="620.5" y="337" font-size="17" text-anchor="middle" fill="#AFB9C4">+120 epochs each</text>
       </g>
     </g>
     <g id="protocol-selection" text-anchor="middle">
-      <rect x="836" y="125" width="282" height="152" rx="11" fill="#DFECF8" />
-      <text x="977" y="155" font-size="21" data-contrast="on-pastel" fill="#242424">REFUGE validation</text>
-      <text id="source-validation-count" x="954" y="187" font-size="24" data-contrast="on-pastel" fill="#242424">80</text>
-      <text x="988" y="187" font-size="17" text-anchor="start" data-contrast="on-pastel" fill="#242424">images</text>
-      <path d="M858 203H1096" fill="none" stroke="#47505B" stroke-width="1.2" />
-      <text x="977" y="229" font-size="20" data-contrast="on-pastel" fill="#242424">Max. Mean Dice</text>
-      <text x="977" y="255" font-size="16" data-contrast="on-pastel" fill="#242424">one best model / branch</text>
-      <text x="977" y="308" font-size="16" fill="#A7AFBA">Source-only checkpoint selection</text>
+      <rect x="836" y="125" width="282" height="152" rx="2" fill="url(#protocol-source-fill)" stroke="#86A6BF" stroke-width="1.1" />
+      <text x="977" y="155" font-size="21" data-contrast="on-pastel" fill="#273440">REFUGE validation</text>
+      <text id="source-validation-count" x="954" y="187" font-size="24" data-contrast="on-pastel" fill="#273440">80</text>
+      <text x="988" y="187" font-size="17" text-anchor="start" data-contrast="on-pastel" fill="#273440">images</text>
+      <path d="M858 203H1096" fill="none" stroke="#557186" stroke-width="1" />
+      <text x="977" y="229" font-size="20" data-contrast="on-pastel" fill="#273440">Max. Mean Dice</text>
+      <text x="977" y="255" font-size="16" data-contrast="on-pastel" fill="#273440">one best model / branch</text>
+      <text x="977" y="308" font-size="16" fill="#AFB9C4">Source-only checkpoint selection</text>
     </g>
     <g id="protocol-targets">
-      <rect x="1210" y="103" width="366" height="40" rx="8" fill="#DFECF8" />
-      <rect x="1210" y="155" width="366" height="40" rx="8" fill="#DFECF8" />
-      <rect x="1210" y="207" width="366" height="40" rx="8" fill="#DFECF8" />
-      <rect x="1210" y="259" width="366" height="40" rx="8" fill="#DFECF8" />
+      <g fill="url(#protocol-target-fill)" stroke="#AE94C3" stroke-width="1.1">
+        <rect x="1210" y="103" width="366" height="40" rx="2" />
+        <rect x="1210" y="155" width="366" height="40" rx="2" />
+        <rect x="1210" y="207" width="366" height="40" rx="2" />
+        <rect x="1210" y="259" width="366" height="40" rx="2" />
+      </g>
       <g id="target-labels" font-size="19">
-        <text x="1230" y="130" data-contrast="on-pastel" fill="#242424">BinRushed</text>
-        <text x="1230" y="182" data-contrast="on-pastel" fill="#242424">Magrabia</text>
-        <text x="1230" y="234" data-contrast="on-pastel" fill="#242424">RIM-ONE DL</text>
-        <text x="1230" y="286" data-contrast="on-pastel" fill="#242424">PAPILA</text>
+        <text x="1230" y="130" data-contrast="on-pastel" fill="#273440">BinRushed</text>
+        <text x="1230" y="182" data-contrast="on-pastel" fill="#273440">Magrabia</text>
+        <text x="1230" y="234" data-contrast="on-pastel" fill="#273440">RIM-ONE DL</text>
+        <text x="1230" y="286" data-contrast="on-pastel" fill="#273440">PAPILA</text>
       </g>
-      <g id="target-counts" font-size="18" text-anchor="end" fill="#A7AFBA">
-        <text x="1555" y="130" data-contrast="on-pastel" fill="#242424">39</text>
-        <text x="1555" y="182" data-contrast="on-pastel" fill="#242424">19</text>
-        <text x="1555" y="234" data-contrast="on-pastel" fill="#242424">174</text>
-        <text x="1555" y="286" data-contrast="on-pastel" fill="#242424">84</text>
+      <g id="target-counts" font-size="18" text-anchor="end" fill="#AFB9C4">
+        <text x="1555" y="130" data-contrast="on-pastel" fill="#273440">39</text>
+        <text x="1555" y="182" data-contrast="on-pastel" fill="#273440">19</text>
+        <text x="1555" y="234" data-contrast="on-pastel" fill="#273440">174</text>
+        <text x="1555" y="286" data-contrast="on-pastel" fill="#273440">84</text>
       </g>
-      <text x="1393" y="337" font-size="17" text-anchor="middle" fill="#A7AFBA">Evaluation only · no target selection</text>
+      <text x="1393" y="337" font-size="17" text-anchor="middle" fill="#AFB9C4">Evaluation only · no target selection</text>
     </g>
-    <g id="protocol-connectors" fill="none" stroke="#E3E6EA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <g id="protocol-connectors" fill="none" stroke="#A1B3BF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M180 201H221" marker-end="url(#arrow)" />
       <path d="M422 201H448M448 108V292" />
       <path d="M448 108H477" marker-end="url(#arrow)" />
@@ -101,7 +120,7 @@
       <path d="M1180 279H1209" marker-end="url(#arrow)" />
     </g>
     <g id="protocol-reporting">
-      <rect x="24" y="366" width="1552" height="47" rx="8" fill="#24282F" />
+      <rect x="24" y="366" width="1552" height="47" rx="2" fill="#242A32" />
       <text x="44" y="396" font-size="17">Seeds:</text>
       <g id="seed-labels" font-size="17" text-anchor="middle">
         <text x="115" y="396">0</text>
@@ -110,7 +129,7 @@
       </g>
       <path d="M194 377V402M913 377V402" fill="none" stroke="#47505B" stroke-width="1.2" />
       <text x="215" y="396" font-size="17">Four-domain mean per seed</text>
-      <path d="M459 390H503" fill="none" stroke="#E3E6EA" stroke-width="1.5" marker-end="url(#arrow)" />
+      <path d="M459 390H503" fill="none" stroke="#A1B3BF" stroke-width="1.5" marker-end="url(#arrow)" />
       <text x="521" y="396" font-size="17">Mean ± sample SD across seeds</text>
       <text x="935" y="396" font-size="17">OD / OC / Mean Dice · hard vCDR MAE · CVR</text>
     </g>
