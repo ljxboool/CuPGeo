@@ -28,10 +28,10 @@ CuPGeo 以视杯为几何锚点：**VRA** 给杯位置提供有界的竖直先�
     <source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/cupgeo-method-mobile-dark.svg">
     <source media="(max-width: 640px)" srcset="assets/cupgeo-method-mobile.svg">
     <source media="(prefers-color-scheme: dark)" srcset="assets/cupgeo-method-dark.svg">
-    <img src="assets/cupgeo-method.svg" alt="CuPGeo 框架：共享特征经 VRA 和 CP 生成嵌套杯盘预测，下方三个细节面板分别展示垂直区域分配、保杯组合与 soft-vCDR 监督" width="100%">
+    <img src="assets/cupgeo-method.svg" alt="CuPGeo 模块流程图：冻结骨干与可训练适配器提取共享特征，VRA 修正杯几何，CP 构造嵌套杯盘预测，并在源域施加训练目标" width="100%">
   </picture>
 </p>
-<p align="center"><sub>浅蓝：VRA · 灰绿：CP · 淡紫：soft-vCDR · 合成矢量示意图<br>OD：视盘 · OC：视杯 · <a href="assets/cupgeo-method.svg">查看大图</a> · <a href="assets/cupgeo-method-mobile.svg">竖版图</a></sub></p>
+<p align="center"><sub>浅蓝：冻结骨干 · 浅桃：可训练模块 · 浅绿：几何运算与训练目标<br>OD：视盘 · OC：视杯 · 缩略图为合成矢量示意 · <a href="assets/cupgeo-method.svg">查看大图</a> · <a href="assets/cupgeo-method-mobile.svg">竖版图</a></sub></p>
 
 | 模块 | 作用 |
 | :--- | :--- |

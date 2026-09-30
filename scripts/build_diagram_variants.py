@@ -1,4 +1,4 @@
-"""Build README theme/portrait variants from the editable SVG artwork.
+"""Build compact README SVG portraits and dark themes from editable masters.
 
 Standard library only; no datasets, model dependencies, or raster conversion.
 Run after editing assets/cupgeo-method.svg or assets/cupgeo-protocol.svg.
@@ -22,8 +22,17 @@ def element(parent, tag, attrs=None, text=None):
     return node
 
 
-def label(parent, x, y, text, size=16, fill="#273440", **extra):
-    return element(parent, "text", {"x": x, "y": y, "font-size": size, "fill": fill, **extra}, text)
+def label(parent, x, y, text, size=18, fill="#242424", **extra):
+    node = element(parent, "text", {"x": x, "y": y, "font-size": size, "fill": fill, **extra}, text)
+    # Use actual SVG subscripts rather than relying on Unicode small-cap glyphs.
+    symbols = {"Z꜀": ("Z", "C"), "Zᵣ": ("Z", "R"), "P꜀": ("P", "C")}
+    for token, (base, sub) in symbols.items():
+        if token in text:
+            before, after = text.split(token, 1)
+            node.text = before + base
+            element(node, "tspan", {"baseline-shift": "sub", "font-size": "70%"}, sub).tail = after
+            break
+    return node
 
 
 def group_by_id(root, name):
@@ -33,128 +42,146 @@ def group_by_id(root, name):
     raise ValueError(f"Missing required SVG element: {name}")
 
 
-def canvas(source, height, title, width=480):
-    root = ET.Element(f"{{{NS}}}svg", {
-        "width": str(width), "height": str(height), "viewBox": f"0 0 {width} {height}",
-        "role": "img", "aria-labelledby": "title desc",
-    })
+def canvas(source, height, title):
+    root = ET.Element(f"{{{NS}}}svg", {"width": "480", "height": str(height),
+        "viewBox": f"0 0 480 {height}", "role": "img", "aria-labelledby": "title desc"})
     element(root, "title", {"id": "title"}, title)
     element(root, "desc", {"id": "desc"}, source.find(f"{{{NS}}}desc").text)
     root.append(copy.deepcopy(source.find(f"{{{NS}}}defs")))
-    element(root, "rect", {"width": width, "height": height, "fill": "#FFFFFF"})
+    element(root, "rect", {"width": 480, "height": height, "fill": "#FFFFFF", "id": "canvas"})
     return root, element(root, "g", {"font-family": FONT})
 
 
+def block(parent, x, y, w, h, lines, fill="#FBE4D5", size=19):
+    element(parent, "rect", {"x": x, "y": y, "width": w, "height": h, "rx": 9, "fill": fill})
+    for i, line in enumerate(lines):
+        label(parent, x+w/2, y+h/2+(i-(len(lines)-1)/2)*24+6, line, size,
+              **{"text-anchor": "middle", "data-contrast": "on-pastel"})
+
+
+def arrow(parent, d, training=False):
+    attrs = {"d": d, "fill": "none", "stroke": "#242424", "stroke-width": 1.5,
+             "marker-end": "url(#arrow)"}
+    if training:
+        attrs["stroke-dasharray"] = "5 4"
+    element(parent, "path", attrs)
+
+
+def stage(parent, y, text):
+    label(parent, 240, y, text, 16, "#868B92", **{"text-anchor": "middle"})
+    half = len(text)*4.4 + 18
+    element(parent, "path", {"d": f"M24 {y-5}H{240-half}M{240+half} {y-5}H456",
+                              "fill": "none", "stroke": "#C6CACF", "stroke-width": 1.3})
+
+
 def method_portrait(source):
-    root, content = canvas(source, 1892, "CuPGeo — architecture and module details, portrait layout", width=510)
-    label(content, 24, 39, "CuPGeo", 30, **{"font-family": "Georgia, Times New Roman, serif", "font-style": "italic", "font-weight": 700})
-    label(content, 490, 37, "Architecture & module details", 16, "#677681", **{"text-anchor": "end"})
-    element(content, "rect", {"x": 20, "y": 62, "width": 470, "height": 300,
-                              "fill": "#FCFDFE", "stroke": "#BFCFDD", "stroke-dasharray": "7 5", "rx": 3})
-
-    def box(x, y, w, h, title, fill, stroke, size=18):
-        element(content, "rect", {"x": x, "y": y, "width": w, "height": h,
-                                  "fill": fill, "stroke": stroke, "rx": 3})
-        label(content, x+w/2, y+h/2+6, title, size, **{"text-anchor": "middle"})
-
-    def arrow(d, prediction=False):
-        kind = "prediction" if prediction else "forward"
-        element(content, "path", {"d": d, "fill": "none", "stroke": "#2383D1" if prediction else "#6C7D89",
-                                  "stroke-width": 1.8, "marker-end": f"url(#{kind})"})
-
-    box(42, 86, 426, 52, "Input → DINOv3 / LoRA → Pyramid-FPN", "#FFF8E5", "#D9C585", 18)
-    arrow("M137 140V167")
-    arrow("M373 140V167")
-    box(42, 172, 191, 45, "Segmentation head", "#E6EFF7", "#8BA9C0")
-    box(277, 172, 191, 45, "VRA", "#E0EEF9", "#8EAFCB")
-    arrow("M137 220V266H167")
-    arrow("M373 220V266H343")
-    box(172, 242, 166, 48, "CP composition", "#E0EFE6", "#8BB9A4")
-    arrow("M255 293V313", prediction=True)
-    label(content, 255, 338, "OD / OC · shared threshold 0.5", 18, **{"text-anchor": "middle"})
-    # Copy complete panels rather than reconstruct their equations or arrows.
-    for name, y in (("detail-vra", 388), ("detail-cp", 876), ("detail-ratio", 1364)):
-        panel = copy.deepcopy(group_by_id(source, name))
-        panel.set("transform", f"translate(20 {y})")
-        content.append(panel)
-    label(content, 255, 1860, "Source training · frozen target inference", 18, "#677681", **{"text-anchor": "middle"})
+    root, g = canvas(source, 850, "CuPGeo — compact architecture, portrait layout")
+    label(g, 24, 36, "CuPGeo", 25, **{"font-weight": 600})
+    label(g, 456, 34, "Source-only segmentation", 16, "#868B92", **{"text-anchor": "end"})
+    stage(g, 76, "Representation")
+    block(g, 24, 98, 202, 60, ["DINOv3-L/16"], "#DFECF8")
+    block(g, 245, 98, 74, 60, ["LoRA"], size=17)
+    block(g, 338, 98, 118, 60, ["Pyramid-FPN"], size=16)
+    arrow(g, "M228 128H241")
+    arrow(g, "M321 128H334")
+    arrow(g, "M397 161V189H124V222")
+    arrow(g, "M358 189V222")
+    block(g, 30, 226, 184, 58, ["Segmentation head"], size=18)
+    block(g, 266, 226, 184, 58, ["VRA"], size=20)
+    arrow(g, "M217 253H262")
+    label(g, 239, 243, "Z꜀", 16, "#B14A44", **{"text-anchor": "middle"})
+    arrow(g, "M124 288V368H141")
+    arrow(g, "M358 288V368H339")
+    label(g, 116, 326, "Z꜀", 18, "#B14A44", **{"text-anchor": "end"})
+    label(g, 371, 326, "B", 18, "#B14A44")
+    block(g, 145, 338, 190, 60, ["Cup refine", "σ(Z꜀ + B)"], "#E2EFD9")
+    arrow(g, "M240 402V448")
+    label(g, 252, 428, "P꜀", 18, "#B14A44")
+    arrow(g, "M27 254H16V490H141")
+    label(g, 29, 425, "Zᵣ", 18, "#B14A44")
+    block(g, 145, 452, 190, 76, ["CP composition", "SG on disc path"], "#E2EFD9", 18)
+    arrow(g, "M240 532V562")
+    block(g, 67, 566, 346, 60, ["Threshold 0.5 → OC ⊆ OD"], "#E2EFD9", 20)
+    arrow(g, "M243 548H440V676", training=True)
+    label(g, 24, 661, "Training only", 16, "#868B92", **{"font-style": "italic"})
+    block(g, 24, 680, 192, 56, ["Source-mask", "moments"], "#E2EFD9", 18)
+    block(g, 250, 680, 206, 56, ["Soft-vCDR", "Smooth L1 · λ = 2"], "#E2EFD9", 18)
+    arrow(g, "M219 708H246", training=True)
+    # Reuse the exact composition from the master, including math subscripts.
+    equation = copy.deepcopy(list(group_by_id(source, "method-legend"))[-1])
+    equation.set("x", "240")
+    equation.set("y", "776")
+    equation.set("font-size", "21")
+    equation.set("text-anchor", "middle")
+    g.append(equation)
+    element(g, "rect", {"x": 16, "y": 797, "width": 448, "height": 37, "rx": 6, "fill": "#F5F5F5"})
+    for x, color, name in ((29, "#DFECF8", "frozen"), (164, "#FBE4D5", "trainable"), (320, "#E2EFD9", "geometry")):
+        element(g, "rect", {"x": x, "y": 806, "width": 20, "height": 19, "rx": 3, "fill": color})
+        label(g, x+28, 821, name, 16)
     return root
 
 
 def protocol_portrait(source):
-    root, content = canvas(source, 1110, "CuPGeo experiment protocol — portrait layout")
-    label(content, 26, 36, "CuPGeo / EXPERIMENT PROTOCOL", 11, "#597285", **{"letter-spacing": 1.4, "font-weight": 700})
-    label(content, 26, 71, "One source. Four targets.", 28, **{"font-weight": 700})
+    root, g = canvas(source, 1040, "CuPGeo — matched experimental protocol, portrait layout")
     total = group_by_id(source, "total-budget").text.split()[0]
     pretraining = group_by_id(source, "pretraining-budget").text
     continuation = group_by_id(source, "continuation-budget").text.removesuffix(" each")
-    seeds = ", ".join(node.text for node in group_by_id(source, "seed-labels"))
-    label(content, 26, 98, f"Matched {total}-epoch CuPGeo experiments", 16, "#677681")
-
-    def box(y, height, fill="#FAFCFE"):
-        return element(content, "rect", {"x": 24, "y": y, "width": 432, "height": height,
-                                         "rx": 2, "fill": fill, "stroke": "#BFCFDD", "stroke-dasharray": "7 5"})
-
-    box(124, 136)
-    label(content, 44, 151, "01 / REFUGE SOURCE", 12, "#597285", **{"font-weight": 700, "letter-spacing": 1})
-    label(content, 44, 196, group_by_id(source, "source-train-count").text, 34, **{"font-weight": 700})
-    label(content, 256, 196, group_by_id(source, "source-validation-count").text, 34, "#496D8A", **{"font-weight": 700})
-    label(content, 44, 227, "Training images", 16, "#677681")
-    label(content, 256, 227, "Source validation", 16, "#677681")
-    element(content, "path", {"d": "M233 169v62", "stroke": "#BFCFDD"})
-
-    box(284, 320)
-    label(content, 44, 313, "02 / MATCHED TRAINING", 12, "#597285", **{"font-weight": 700, "letter-spacing": 1})
-    label(content, 44, 349, f"CP pretraining · {pretraining}", 21, **{"font-weight": 700})
-    label(content, 44, 375, "Same-seed CP best → independent branches", 15, "#677681")
-    # Read branch names from the master figure, so labels stay synchronized.
     branches = [node.text for node in group_by_id(source, "branch-labels")]
-    if len(branches) != 5:
-        raise ValueError("Expected five continuation labels in the protocol master")
+    names = [node.text for node in group_by_id(source, "target-labels")]
+    counts = [node.text for node in group_by_id(source, "target-counts")]
+    seeds = ", ".join(node.text for node in group_by_id(source, "seed-labels"))
+    if len(branches) != 5 or len(names) != 4 or len(counts) != 4:
+        raise ValueError("Expected five continuations and four target domains")
+    label(g, 24, 37, "Matched experiments", 25, **{"font-weight": 600})
+    label(g, 456, 35, f"{total} epochs", 17, "#868B92", **{"text-anchor": "end"})
+    stage(g, 78, "Source training")
+    training_count = group_by_id(source, "source-train-count").text
+    validation_count = group_by_id(source, "source-validation-count").text
+    block(g, 24, 98, 196, 66, ["REFUGE", f"{training_count} training images"], "#DFECF8", 19)
+    block(g, 252, 98, 204, 66, ["CP pretraining", pretraining], size=19)
+    arrow(g, "M223 131H248")
+    arrow(g, "M354 168V203H50V449")
+    label(g, 240, 194, "Same-seed source-selected CP best", 16, "#868B92", **{"text-anchor": "middle"})
     for i, name in enumerate(branches):
-        y = 397 + i * 36
-        element(content, "rect", {"x": 68, "y": y, "width": 366, "height": 29, "rx": 2,
-                                  "fill": "url(#cp-fill)" if name == "Full CuPGeo" else "#FFFFFF", "stroke": "#CADDD2"})
-        label(content, 83, y + 20, name, 16, "#426D58", **{"font-weight": 700 if name == "Full CuPGeo" else 400})
-        label(content, 419, y + 20, continuation, 14, "#786889", **{"text-anchor": "end"})
-        element(content, "path", {"d": f"M48 {y+14}h15", "fill": "none", "stroke": "#6C7D89", "marker-end": "url(#arrow)"})
-    element(content, "path", {"d": "M48 411v144", "stroke": "#AACDBB"})
-    label(content, 44, 591, "Select by source-validation Mean Dice", 14, "#5F7D6D")
-
-    box(628, 224)
-    label(content, 44, 657, "03 / FROZEN EVALUATION", 12, "#597285", **{"font-weight": 700, "letter-spacing": 1})
-    # Keep the benchmark sizes in the master SVG as the source of truth.
-    names, counts = group_by_id(source, "target-labels"), group_by_id(source, "target-counts")
-    if len(names) != 4 or len(counts) != 4:
-        raise ValueError("Expected four domain names and counts in the protocol master")
-    for i, (name_node, count_node) in enumerate(zip(names, counts)):
-        row_y = 695 + i * 34
-        label(content, 44, row_y, name_node.text, 18, "#426D58")
-        label(content, 434, row_y, f"{count_node.text} images", 16, "#786889", **{"text-anchor": "end"})
-    label(content, 44, 834, "Targets are used for evaluation only", 14, "#5F7D6D")
-
-    box(876, 176, "#F5F0FA")
-    label(content, 44, 906, f"REPORTING / SEEDS {seeds}", 12, "#786889", **{"letter-spacing": 1.1, "font-weight": 700})
-    label(content, 44, 944, "Equal four-domain average", 21, "#28363D", **{"font-weight": 700})
-    label(content, 44, 972, "within each seed", 16, "#6D7280")
-    label(content, 44, 1010, "↓ Mean ± sample SD across seeds", 18, "#28363D")
-    for y in (266, 610, 858):
-        element(content, "path", {"d": f"M240 {y}v10", "fill": "none", "stroke": "#6C7D89",
-                                  "stroke-width": 1.5, "marker-end": "url(#arrow)"})
-    label(content, 240, 1086, "One fixed source split · no target selection", 14, "#677681", **{"text-anchor": "middle"})
+        y = 229+i*50
+        element(g, "rect", {"x": 85, "y": y, "width": 371, "height": 39, "rx": 7, "fill": "#FBE4D5"})
+        label(g, 101, y+26, name, 18, **{"data-contrast": "on-pastel", "font-weight": 600 if name == "Full CuPGeo" else 400})
+        label(g, 440, y+25, continuation, 16, **{"text-anchor": "end", "data-contrast": "on-pastel"})
+        arrow(g, f"M50 {y+20}H81")
+    label(g, 240, 496, "Five independent continuations", 16, "#868B92", **{"text-anchor": "middle"})
+    stage(g, 539, "Source-only selection")
+    block(g, 24, 558, 432, 78, [f"REFUGE · {validation_count} validation images", "Best source-validation Mean Dice"], "#DFECF8", 20)
+    stage(g, 681, "Frozen evaluation")
+    for i, (name, count) in enumerate(zip(names, counts)):
+        y = 701+i*43
+        element(g, "rect", {"x": 24, "y": y, "width": 432, "height": 33, "rx": 6, "fill": "#E2EFD9"})
+        label(g, 40, y+23, name, 18, **{"data-contrast": "on-pastel"})
+        label(g, 440, y+23, f"{count} images", 16, **{"text-anchor": "end", "data-contrast": "on-pastel"})
+    label(g, 240, 893, "Targets used for evaluation only", 16, "#868B92", **{"text-anchor": "middle"})
+    element(g, "rect", {"x": 16, "y": 916, "width": 448, "height": 108, "rx": 6, "fill": "#F5F5F5"})
+    label(g, 35, 945, f"Seeds {seeds}", 18)
+    label(g, 35, 975, "Equal four-domain mean within each seed", 17)
+    label(g, 35, 1004, "→ Mean ± sample SD across seeds", 17)
     return root
 
 
 def dark_variant(source):
-    # Retain the manuscript's white canvas and semantic palette in both themes.
-    # A probability map or a scientific arrow must not change meaning with the UI.
-    return copy.deepcopy(source)
+    root = copy.deepcopy(source)
+    palette = {"#FFFFFF": "#171A1F", "#F5F5F5": "#24282F", "#242424": "#E3E6EA",
+               "#868B92": "#A7AFBA", "#C6CACF": "#59616C", "#D5D8DC": "#47505B",
+               "#B14A44": "#EDA092"}
+    for node in root.iter():
+        for attr in ("fill", "stroke"):
+            if node.get(attr) in palette:
+                node.set(attr, palette[node.get(attr)])
+        if node.get("data-contrast") == "on-pastel":
+            # Some labels inherit their fill from the source group.
+            node.set("fill", "#242424")
+    return root
 
 
 def serialized(root):
     ET.indent(root, space="  ")
-    # Indentation inside SVG text/tspan elements becomes visible word spacing.
-    # Keep math subscripts adjacent to their symbols after pretty-printing.
     for node in root.iter(f"{{{NS}}}text"):
         for part in node.iter():
             if part.text and part.text.isspace():

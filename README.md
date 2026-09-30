@@ -32,10 +32,10 @@ CuPGeo treats the optic cup as a geometric anchor. A vertical region allocation 
     <source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/cupgeo-method-mobile-dark.svg">
     <source media="(max-width: 640px)" srcset="assets/cupgeo-method-mobile.svg">
     <source media="(prefers-color-scheme: dark)" srcset="assets/cupgeo-method-dark.svg">
-    <img src="assets/cupgeo-method.svg" alt="CuPGeo framework: shared features feed VRA and CP before nested cup-disc prediction; three detail panels explain vertical allocation, cup-preserving composition, and soft-vCDR supervision" width="100%">
+    <img src="assets/cupgeo-method.svg" alt="CuPGeo block diagram: a frozen backbone and trainable adapters feed shared features, VRA refines cup geometry, and CP produces nested cup-disc predictions with source-training objectives" width="100%">
   </picture>
 </p>
-<p align="center"><sub>Blue: VRA · Sage: CP · Lavender: soft-vCDR · Synthetic vector illustration<br>OD: optic disc · OC: optic cup · <a href="assets/cupgeo-method.svg">Full-size figure</a> · <a href="assets/cupgeo-method-mobile.svg">Portrait view</a></sub></p>
+<p align="center"><sub>Blue: frozen backbone · Peach: trainable modules · Green: geometry and objectives<br>OD: optic disc · OC: optic cup · Synthetic vector thumbnails · <a href="assets/cupgeo-method.svg">Full-size figure</a> · <a href="assets/cupgeo-method-mobile.svg">Portrait view</a></sub></p>
 
 | Geometry | What it contributes |
 | :--- | :--- |

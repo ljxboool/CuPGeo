@@ -1,83 +1,73 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="480" height="1110" viewBox="0 0 480 1110" role="img" aria-labelledby="title desc">
-  <title id="title">CuPGeo experiment protocol — portrait layout</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="1040" viewBox="0 0 480 1040" role="img" aria-labelledby="title desc">
+  <title id="title">CuPGeo — matched experimental protocol, portrait layout</title>
   <desc id="desc">REFUGE supplies 320 training images and 80 source-validation images. For each of seeds 0, 1, and 2, CP is pretrained for 120 epochs. Its best source-validation checkpoint independently initializes five 120-epoch continuations: CP only, Full CuPGeo, without ratio, without VRA, and without stop-gradient. Source-validation Mean Dice selects checkpoints. Frozen models are evaluated on BinRushed, 39 images; Magrabia, 19; RIM-ONE DL, 174; and PAPILA, 84. Target data do not participate in training or model selection. Results are averaged equally across the four domains within each seed, then summarized as the mean and sample standard deviation across seeds.</desc>
   <defs>
-    <linearGradient id="source-fill" x1="0" y1="0" x2="0" y2="1">
-      <stop stop-color="#EDF5FC" />
-      <stop offset="1" stop-color="#D8E8F6" />
-    </linearGradient>
-    <linearGradient id="cp-fill" x1="0" y1="0" x2="0" y2="1">
-      <stop stop-color="#EAF5EF" />
-      <stop offset="1" stop-color="#CEE5D8" />
-    </linearGradient>
-    <linearGradient id="ratio-fill" x1="0" y1="0" x2="0" y2="1">
-      <stop stop-color="#F1ECF8" />
-      <stop offset="1" stop-color="#E3D8F0" />
-    </linearGradient>
-    <marker id="arrow" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="8" refY="5" orient="auto">
-      <path d="M1 1L9 5L1 9Z" fill="#667D8A" />
+    <marker id="arrow" viewBox="0 0 10 10" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto">
+      <path d="M1 1L9 5L1 9Z" fill="#242424" />
     </marker>
-    <marker id="prediction-arrow" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="8" refY="5" orient="auto">
-      <path d="M1 1L9 5L1 9Z" fill="#2387D8" />
+    <marker id="stage-arrow" viewBox="0 0 10 10" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#C6CACF" stroke-width="1.5" />
     </marker>
   </defs>
-  <rect width="480" height="1110" fill="#FFFFFF" />
+  <rect width="480" height="1040" fill="#FFFFFF" id="canvas" />
   <g font-family="Arial, Helvetica, sans-serif">
-    <text x="26" y="36" font-size="11" fill="#597285" letter-spacing="1.4" font-weight="700">CuPGeo / EXPERIMENT PROTOCOL</text>
-    <text x="26" y="71" font-size="28" fill="#273440" font-weight="700">One source. Four targets.</text>
-    <text x="26" y="98" font-size="16" fill="#677681">Matched 240-epoch CuPGeo experiments</text>
-    <rect x="24" y="124" width="432" height="136" rx="2" fill="#FAFCFE" stroke="#BFCFDD" stroke-dasharray="7 5" />
-    <text x="44" y="151" font-size="12" fill="#597285" font-weight="700" letter-spacing="1">01 / REFUGE SOURCE</text>
-    <text x="44" y="196" font-size="34" fill="#273440" font-weight="700">320</text>
-    <text x="256" y="196" font-size="34" fill="#496D8A" font-weight="700">80</text>
-    <text x="44" y="227" font-size="16" fill="#677681">Training images</text>
-    <text x="256" y="227" font-size="16" fill="#677681">Source validation</text>
-    <path d="M233 169v62" stroke="#BFCFDD" />
-    <rect x="24" y="284" width="432" height="320" rx="2" fill="#FAFCFE" stroke="#BFCFDD" stroke-dasharray="7 5" />
-    <text x="44" y="313" font-size="12" fill="#597285" font-weight="700" letter-spacing="1">02 / MATCHED TRAINING</text>
-    <text x="44" y="349" font-size="21" fill="#273440" font-weight="700">CP pretraining · 120 epochs</text>
-    <text x="44" y="375" font-size="15" fill="#677681">Same-seed CP best → independent branches</text>
-    <rect x="68" y="397" width="366" height="29" rx="2" fill="#FFFFFF" stroke="#CADDD2" />
-    <text x="83" y="417" font-size="16" fill="#426D58" font-weight="400">CP only</text>
-    <text x="419" y="417" font-size="14" fill="#786889" text-anchor="end">+120 epochs</text>
-    <path d="M48 411h15" fill="none" stroke="#6C7D89" marker-end="url(#arrow)" />
-    <rect x="68" y="433" width="366" height="29" rx="2" fill="url(#cp-fill)" stroke="#CADDD2" />
-    <text x="83" y="453" font-size="16" fill="#426D58" font-weight="700">Full CuPGeo</text>
-    <text x="419" y="453" font-size="14" fill="#786889" text-anchor="end">+120 epochs</text>
-    <path d="M48 447h15" fill="none" stroke="#6C7D89" marker-end="url(#arrow)" />
-    <rect x="68" y="469" width="366" height="29" rx="2" fill="#FFFFFF" stroke="#CADDD2" />
-    <text x="83" y="489" font-size="16" fill="#426D58" font-weight="400">w/o ratio</text>
-    <text x="419" y="489" font-size="14" fill="#786889" text-anchor="end">+120 epochs</text>
-    <path d="M48 483h15" fill="none" stroke="#6C7D89" marker-end="url(#arrow)" />
-    <rect x="68" y="505" width="366" height="29" rx="2" fill="#FFFFFF" stroke="#CADDD2" />
-    <text x="83" y="525" font-size="16" fill="#426D58" font-weight="400">w/o VRA</text>
-    <text x="419" y="525" font-size="14" fill="#786889" text-anchor="end">+120 epochs</text>
-    <path d="M48 519h15" fill="none" stroke="#6C7D89" marker-end="url(#arrow)" />
-    <rect x="68" y="541" width="366" height="29" rx="2" fill="#FFFFFF" stroke="#CADDD2" />
-    <text x="83" y="561" font-size="16" fill="#426D58" font-weight="400">w/o SG</text>
-    <text x="419" y="561" font-size="14" fill="#786889" text-anchor="end">+120 epochs</text>
-    <path d="M48 555h15" fill="none" stroke="#6C7D89" marker-end="url(#arrow)" />
-    <path d="M48 411v144" stroke="#AACDBB" />
-    <text x="44" y="591" font-size="14" fill="#5F7D6D">Select by source-validation Mean Dice</text>
-    <rect x="24" y="628" width="432" height="224" rx="2" fill="#FAFCFE" stroke="#BFCFDD" stroke-dasharray="7 5" />
-    <text x="44" y="657" font-size="12" fill="#597285" font-weight="700" letter-spacing="1">03 / FROZEN EVALUATION</text>
-    <text x="44" y="695" font-size="18" fill="#426D58">BinRushed</text>
-    <text x="434" y="695" font-size="16" fill="#786889" text-anchor="end">39 images</text>
-    <text x="44" y="729" font-size="18" fill="#426D58">Magrabia</text>
-    <text x="434" y="729" font-size="16" fill="#786889" text-anchor="end">19 images</text>
-    <text x="44" y="763" font-size="18" fill="#426D58">RIM-ONE DL</text>
-    <text x="434" y="763" font-size="16" fill="#786889" text-anchor="end">174 images</text>
-    <text x="44" y="797" font-size="18" fill="#426D58">PAPILA</text>
-    <text x="434" y="797" font-size="16" fill="#786889" text-anchor="end">84 images</text>
-    <text x="44" y="834" font-size="14" fill="#5F7D6D">Targets are used for evaluation only</text>
-    <rect x="24" y="876" width="432" height="176" rx="2" fill="#F5F0FA" stroke="#BFCFDD" stroke-dasharray="7 5" />
-    <text x="44" y="906" font-size="12" fill="#786889" letter-spacing="1.1" font-weight="700">REPORTING / SEEDS 0, 1, 2</text>
-    <text x="44" y="944" font-size="21" fill="#28363D" font-weight="700">Equal four-domain average</text>
-    <text x="44" y="972" font-size="16" fill="#6D7280">within each seed</text>
-    <text x="44" y="1010" font-size="18" fill="#28363D">↓ Mean ± sample SD across seeds</text>
-    <path d="M240 266v10" fill="none" stroke="#6C7D89" stroke-width="1.5" marker-end="url(#arrow)" />
-    <path d="M240 610v10" fill="none" stroke="#6C7D89" stroke-width="1.5" marker-end="url(#arrow)" />
-    <path d="M240 858v10" fill="none" stroke="#6C7D89" stroke-width="1.5" marker-end="url(#arrow)" />
-    <text x="240" y="1086" font-size="14" fill="#677681" text-anchor="middle">One fixed source split · no target selection</text>
+    <text x="24" y="37" font-size="25" fill="#242424" font-weight="600">Matched experiments</text>
+    <text x="456" y="35" font-size="17" fill="#868B92" text-anchor="end">240 epochs</text>
+    <text x="240" y="78" font-size="16" fill="#868B92" text-anchor="middle">Source training</text>
+    <path d="M24 73H156.0M324.0 73H456" fill="none" stroke="#C6CACF" stroke-width="1.3" />
+    <rect x="24" y="98" width="196" height="66" rx="9" fill="#DFECF8" />
+    <text x="122.0" y="125.0" font-size="19" fill="#242424" text-anchor="middle" data-contrast="on-pastel">REFUGE</text>
+    <text x="122.0" y="149.0" font-size="19" fill="#242424" text-anchor="middle" data-contrast="on-pastel">320 training images</text>
+    <rect x="252" y="98" width="204" height="66" rx="9" fill="#FBE4D5" />
+    <text x="354.0" y="125.0" font-size="19" fill="#242424" text-anchor="middle" data-contrast="on-pastel">CP pretraining</text>
+    <text x="354.0" y="149.0" font-size="19" fill="#242424" text-anchor="middle" data-contrast="on-pastel">120 epochs</text>
+    <path d="M223 131H248" fill="none" stroke="#242424" stroke-width="1.5" marker-end="url(#arrow)" />
+    <path d="M354 168V203H50V449" fill="none" stroke="#242424" stroke-width="1.5" marker-end="url(#arrow)" />
+    <text x="240" y="194" font-size="16" fill="#868B92" text-anchor="middle">Same-seed source-selected CP best</text>
+    <rect x="85" y="229" width="371" height="39" rx="7" fill="#FBE4D5" />
+    <text x="101" y="255" font-size="18" fill="#242424" data-contrast="on-pastel" font-weight="400">CP only</text>
+    <text x="440" y="254" font-size="16" fill="#242424" text-anchor="end" data-contrast="on-pastel">+120 epochs</text>
+    <path d="M50 249H81" fill="none" stroke="#242424" stroke-width="1.5" marker-end="url(#arrow)" />
+    <rect x="85" y="279" width="371" height="39" rx="7" fill="#FBE4D5" />
+    <text x="101" y="305" font-size="18" fill="#242424" data-contrast="on-pastel" font-weight="600">Full CuPGeo</text>
+    <text x="440" y="304" font-size="16" fill="#242424" text-anchor="end" data-contrast="on-pastel">+120 epochs</text>
+    <path d="M50 299H81" fill="none" stroke="#242424" stroke-width="1.5" marker-end="url(#arrow)" />
+    <rect x="85" y="329" width="371" height="39" rx="7" fill="#FBE4D5" />
+    <text x="101" y="355" font-size="18" fill="#242424" data-contrast="on-pastel" font-weight="400">w/o ratio</text>
+    <text x="440" y="354" font-size="16" fill="#242424" text-anchor="end" data-contrast="on-pastel">+120 epochs</text>
+    <path d="M50 349H81" fill="none" stroke="#242424" stroke-width="1.5" marker-end="url(#arrow)" />
+    <rect x="85" y="379" width="371" height="39" rx="7" fill="#FBE4D5" />
+    <text x="101" y="405" font-size="18" fill="#242424" data-contrast="on-pastel" font-weight="400">w/o VRA</text>
+    <text x="440" y="404" font-size="16" fill="#242424" text-anchor="end" data-contrast="on-pastel">+120 epochs</text>
+    <path d="M50 399H81" fill="none" stroke="#242424" stroke-width="1.5" marker-end="url(#arrow)" />
+    <rect x="85" y="429" width="371" height="39" rx="7" fill="#FBE4D5" />
+    <text x="101" y="455" font-size="18" fill="#242424" data-contrast="on-pastel" font-weight="400">w/o SG</text>
+    <text x="440" y="454" font-size="16" fill="#242424" text-anchor="end" data-contrast="on-pastel">+120 epochs</text>
+    <path d="M50 449H81" fill="none" stroke="#242424" stroke-width="1.5" marker-end="url(#arrow)" />
+    <text x="240" y="496" font-size="16" fill="#868B92" text-anchor="middle">Five independent continuations</text>
+    <text x="240" y="539" font-size="16" fill="#868B92" text-anchor="middle">Source-only selection</text>
+    <path d="M24 534H129.6M350.4 534H456" fill="none" stroke="#C6CACF" stroke-width="1.3" />
+    <rect x="24" y="558" width="432" height="78" rx="9" fill="#DFECF8" />
+    <text x="240.0" y="591.0" font-size="20" fill="#242424" text-anchor="middle" data-contrast="on-pastel">REFUGE · 80 validation images</text>
+    <text x="240.0" y="615.0" font-size="20" fill="#242424" text-anchor="middle" data-contrast="on-pastel">Best source-validation Mean Dice</text>
+    <text x="240" y="681" font-size="16" fill="#868B92" text-anchor="middle">Frozen evaluation</text>
+    <path d="M24 676H147.2M332.8 676H456" fill="none" stroke="#C6CACF" stroke-width="1.3" />
+    <rect x="24" y="701" width="432" height="33" rx="6" fill="#E2EFD9" />
+    <text x="40" y="724" font-size="18" fill="#242424" data-contrast="on-pastel">BinRushed</text>
+    <text x="440" y="724" font-size="16" fill="#242424" text-anchor="end" data-contrast="on-pastel">39 images</text>
+    <rect x="24" y="744" width="432" height="33" rx="6" fill="#E2EFD9" />
+    <text x="40" y="767" font-size="18" fill="#242424" data-contrast="on-pastel">Magrabia</text>
+    <text x="440" y="767" font-size="16" fill="#242424" text-anchor="end" data-contrast="on-pastel">19 images</text>
+    <rect x="24" y="787" width="432" height="33" rx="6" fill="#E2EFD9" />
+    <text x="40" y="810" font-size="18" fill="#242424" data-contrast="on-pastel">RIM-ONE DL</text>
+    <text x="440" y="810" font-size="16" fill="#242424" text-anchor="end" data-contrast="on-pastel">174 images</text>
+    <rect x="24" y="830" width="432" height="33" rx="6" fill="#E2EFD9" />
+    <text x="40" y="853" font-size="18" fill="#242424" data-contrast="on-pastel">PAPILA</text>
+    <text x="440" y="853" font-size="16" fill="#242424" text-anchor="end" data-contrast="on-pastel">84 images</text>
+    <text x="240" y="893" font-size="16" fill="#868B92" text-anchor="middle">Targets used for evaluation only</text>
+    <rect x="16" y="916" width="448" height="108" rx="6" fill="#F5F5F5" />
+    <text x="35" y="945" font-size="18" fill="#242424">Seeds 0, 1, 2</text>
+    <text x="35" y="975" font-size="17" fill="#242424">Equal four-domain mean within each seed</text>
+    <text x="35" y="1004" font-size="17" fill="#242424">→ Mean ± sample SD across seeds</text>
   </g>
 </svg>
